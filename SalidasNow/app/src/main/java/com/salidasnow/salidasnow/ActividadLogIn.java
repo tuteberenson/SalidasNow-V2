@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -130,7 +130,7 @@ public class ActividadLogIn extends Activity implements LoaderCallbacks<Cursor> 
             mPleaseWait = findViewById(R.id.txPleaseWait);
 
             //mUsernameView
-            populateAutoComplete();
+            //populateAutoComplete();
 
             //mPasswordView
             mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -195,15 +195,15 @@ public class ActividadLogIn extends Activity implements LoaderCallbacks<Cursor> 
             return null;
         }
     }
-    private void populateAutoComplete() {
+    /*private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
         }
 
         getLoaderManager().initLoader(0, null, this);
-    }
+    }*/
 
-    private boolean mayRequestContacts() {
+   /* private boolean mayRequestContacts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -223,12 +223,12 @@ public class ActividadLogIn extends Activity implements LoaderCallbacks<Cursor> 
             requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
         }
         return false;
-    }
+    }*/
 
     /**
      * Callback received when a permissions request has been completed.
      */
-    @Override
+  /*  @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
@@ -236,7 +236,7 @@ public class ActividadLogIn extends Activity implements LoaderCallbacks<Cursor> 
                 populateAutoComplete();
             }
         }
-    }
+    }*/
 
 
     /**
@@ -516,7 +516,7 @@ public class ActividadLogIn extends Activity implements LoaderCallbacks<Cursor> 
                     Toast.makeText(ActividadLogIn.this, "Ocurrió un error, ingrese nuevamente", Toast.LENGTH_SHORT).show();
 
                     //mUsernameView
-                    populateAutoComplete();
+                    //populateAutoComplete();
 
                     //mPasswordView
                     mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {

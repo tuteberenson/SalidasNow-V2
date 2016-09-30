@@ -339,7 +339,7 @@ public class ActividadPrincipal extends AppCompatActivity
         }
 
         private void setListViewAdapter(ArrayList<Restaurantes>lista) {
-            adapter = new AdaptadorListViewRestaurantes(ActividadPrincipal.this,R.layout.list_item_restaurant, lista);
+            adapter = new AdaptadorListViewRestaurantes(ActividadPrincipal.this,R.layout.list_item_restaurant, lista, usuarioActual);
             listView.setAdapter(adapter);
 
             //totalClassmates.setText("Restaurantes");

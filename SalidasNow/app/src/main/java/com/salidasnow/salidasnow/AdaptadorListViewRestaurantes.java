@@ -1,17 +1,32 @@
 package com.salidasnow.salidasnow;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -21,11 +36,13 @@ import java.util.ArrayList;
 public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
     ArrayList<Restaurantes> restaurants;
     Context context;
+    Usuarios usuarioActual;
 
-    public AdaptadorListViewRestaurantes(Context context,int resource, ArrayList<Restaurantes> restaurants) {
+    public AdaptadorListViewRestaurantes(Context context,int resource, ArrayList<Restaurantes> restaurants, Usuarios usuario) {
         super(context,resource,restaurants);
         this.context = context;
         this.restaurants = restaurants;
+        this.usuarioActual=usuario;
     }
 
   /*  @Override
@@ -103,7 +120,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                 break;
         }
         //handling buttons event
-        holder.btnEdit.setOnClickListener(onEditListener(position, holder));
+        holder.btnEdit.setOnClickListener(onLikeListener(position, holder));
         holder.btnDelete.setOnClickListener(onDeleteListener(position, holder));
         holder.estrellasTV.setText("Estrellas: " + p.get_Estrellas());
 
@@ -111,10 +128,24 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
     }
 
 
-    private View.OnClickListener onEditListener(final int position, final ViewHolder holder) {
+    private View.OnClickListener onLikeListener(final int position, final ViewHolder holder) {
         return new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
+                if (position!=0)
+                {
+                    UsuariosRestaurantes usuariosRestaurantes=new UsuariosRestaurantes();
+                   int idRestaurant = restaurants.get(position-1).get_IdRestaurant();
+                    int idUsuario = usuarioActual.get_idUsuario();
+
+                    usuariosRestaurantes.setIdRestaurant(idRestaurant);
+                    usuariosRestaurantes.setIdUsuario(idUsuario);
+
+                        //TODO fijarse php
+
+                }
+
              //   showEditDialog(position, holder);
             }
         };
@@ -193,6 +224,102 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
             estrellasTV = (TextView)v.findViewById(R.id.txvwLVestrellas);
 
             swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
+        }
+    }
+
+    public void senddatatoserver(UsuariosRestaurantes usuRes) {
+        //function in the activity that corresponds to the layout button
+        JSONObject post_dict = new JSONObject();
+
+        try {
+            post_dict.put("idUsuario", usuRes.getIdUsuario());
+            post_dict.put("idRestaurant", usuRes.getIdRestaurant());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (post_dict.length() > 0) {
+            new SendJsonDataToServer().execute(String.valueOf(post_dict));
+        }
+    }
+
+    class SendJsonDataToServer extends AsyncTask<String, String, String> {
+
+        private ProgressDialog dialog = new ProgressDialog(context);
+
+        @Override
+        protected void onPreExecute() {
+            this.dialog.setMessage("Please wait");
+            this.dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String JsonResponse = null;
+            String JsonDATA = params[0];
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            try {
+                URL url = new URL("http://salidasnow.hol.es/insertar_usuario.php");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setDoOutput(true);
+                // is output buffer writter
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Accept", "application/json");
+//set headers and method
+                Writer writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "UTF-8"));
+                writer.write(JsonDATA);
+// json data
+                writer.close();
+                InputStream inputStream = urlConnection.getInputStream();
+//input stream
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String inputLine;
+                while ((inputLine = reader.readLine()) != null)
+                    buffer.append(inputLine + "\n");
+                if (buffer.length() == 0) {
+                    // Stream was empty. No point in parsing.
+                    return null;
+                }
+                JsonResponse = buffer.toString();
+//response data
+                Log.i("adapterListView", JsonResponse);
+
+//send to post execute
+
+                return JsonResponse;
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e("adapterListView", "Error closing stream", e);
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d("adapterListView", s);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
         }
     }
 }
