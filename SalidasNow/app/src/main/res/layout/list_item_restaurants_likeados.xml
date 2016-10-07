@@ -33,6 +33,7 @@
         android:layout_height="60dp"
         android:weightSum="5"
         android:gravity="center"
+        android:id="@+id/un_item_listV"
         >
         <LinearLayout
             android:layout_width="0dp"
@@ -48,6 +49,7 @@
                 android:textSize="20dp"
                 android:textColor="#b30707"
                 android:text="aaa"
+                android:maxLines="1"
                 />
             <TextView
                 android:id="@+id/direc"
@@ -56,6 +58,7 @@
                 android:textSize="15dp"
                 android:textColor="#000"
                 android:text="aaa"
+                android:maxLines="1"
                 />
         </LinearLayout>
         <LinearLayout
@@ -116,7 +119,7 @@
                     android:text="$"
                     />
             </LinearLayout>
-            <TextView
+         <!--   <TextView
                 android:id="@+id/txvwLVestrellas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -124,7 +127,66 @@
                 android:textColor="#000"
                 android:text="aaa"
                 android:gravity="left"
-                />
+                />-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="5"
+                android:gravity="right">
+                <TextView
+                    android:id="@+id/Calidad1"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="#000000"
+                    android:text="★"
+                    android:paddingLeft="10dp"
+                    />
+                <TextView
+                    android:id="@+id/Calidad2"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="#000000"
+                    android:text="★"
+                    android:paddingLeft="10dp"
+                    />
+                <TextView
+                    android:id="@+id/Calidad3"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="#000000"
+                    android:text="★"
+                    android:paddingLeft="10dp"
+                    />
+                <TextView
+                    android:id="@+id/Calidad4"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="#000000"
+                    android:text="☆"
+                    android:paddingLeft="10dp"
+                    />
+
+                <TextView
+                    android:id="@+id/Calidad5"
+
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="#000000"
+                    android:text="☆"
+                    android:paddingLeft="10dp"
+                    />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </com.daimajia.swipe.SwipeLayout>

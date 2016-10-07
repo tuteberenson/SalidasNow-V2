@@ -1,6 +1,8 @@
 package com.salidasnow.salidasnow;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -56,6 +58,7 @@ public class ActividadPrincipal extends AppCompatActivity
 
     private final static String TAG = ActividadPrincipal.class.getSimpleName();
 
+    //TODO fijarse lo de las estrellas
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +119,21 @@ public class ActividadPrincipal extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            new AlertDialog.Builder(this)
+                    .setIcon(R.drawable.ic_pan_tool_black_24dp)
+                    .setTitle("¿Cerrar?")
+                    .setMessage("El tren de SalidasNow pasa una sola vez en la vida ¿Quere salir?")
+                    .setPositiveButton("Sí", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+           //super.onBackPressed();
         }
     }
 

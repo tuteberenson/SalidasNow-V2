@@ -159,6 +159,8 @@ public class FragmentBuscarRestaurantes extends Fragment {
                 Precio = spnprecio.getSelectedItem().toString();
                 NombreRestaurant= txtnombre.getText().toString().trim();
 
+
+
                 String textoABuscar="";
                  for (int i=0; i < NombreRestaurant.length(); i++)
                  {
@@ -243,10 +245,16 @@ public class FragmentBuscarRestaurantes extends Fragment {
                 }
                 else if (txtnombre.getVisibility()== View.VISIBLE)
                 {
-                    String url2 = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byNombre.php?nombre="+ textoABuscar;
-                    Log.d("url byNombre", url2);
-                    MyTaskParams parametros=new MyTaskParams(url2,"Nombre");
-                    new TraerRestaurantes().execute(parametros);
+                    if(textoABuscar.compareTo("")==0) {
+                        txtnombre.setError("Complete el campo");
+                    }else
+                    {
+                        String url2 = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byNombre.php?nombre=" + textoABuscar;
+                        Log.d("url byNombre", url2);
+                        MyTaskParams parametros = new MyTaskParams(url2, "Nombre");
+                        new TraerRestaurantes().execute(parametros);
+
+                    }
                 }
             }
 
@@ -256,6 +264,7 @@ public class FragmentBuscarRestaurantes extends Fragment {
 
         return vista;
     }
+
     private static class MyTaskParams {
         String url, tipoDeBusqueda;
 

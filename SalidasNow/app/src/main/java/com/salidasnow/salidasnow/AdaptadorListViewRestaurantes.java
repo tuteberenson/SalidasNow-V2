@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -129,11 +130,50 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         if (DesdeDondeLlamo!=1) {
             holder.btnDelete.setOnClickListener(onDeleteListener(position, holder));
         }
-        holder.estrellasTV.setText("Estrellas: " + p.get_Estrellas());
+        //holder.estrellasTV.setText("Estrellas: " + p.get_Estrellas());
+
+        switch (p.get_Estrellas()) {
+            case 1:
+                holder.Calidad1.setText("★");
+                holder.Calidad2.setText("☆");
+                holder.Calidad3.setText("☆");
+                holder.Calidad4.setText("☆");
+                holder.Calidad5.setText("☆");
+                break;
+            case 2:
+                holder.Calidad1.setText("★");
+                holder.Calidad2.setText("★");
+                holder.Calidad3.setText("☆");
+                holder.Calidad4.setText("☆");
+                holder.Calidad5.setText("☆");
+                break;
+            case 3:
+                holder.Calidad1.setText("★");
+                holder.Calidad2.setText("★");
+                holder.Calidad3.setText("★");
+                holder.Calidad4.setText("☆");
+                holder.Calidad5.setText("☆");
+                break;
+            case 4:
+                holder.Calidad1.setText("★");
+                holder.Calidad2.setText("★");
+                holder.Calidad3.setText("★");
+                holder.Calidad4.setText("★");
+                holder.Calidad5.setText("☆");
+                break;
+            case 5:
+                holder.Calidad1.setText("★");
+                holder.Calidad2.setText("★");
+                holder.Calidad3.setText("★");
+                holder.Calidad4.setText("★");
+                holder.Calidad5.setText("★");
+                break;
+        }
 
         if (p.is_Likeado())
         {
             holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
+            holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
         }
         else
         {
@@ -166,11 +206,13 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                     {
                         holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
                         Toast.makeText(context, "Me gusta!", Toast.LENGTH_SHORT).show();
+                        holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
                     }
                     else
                     {
                         holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
                         Toast.makeText(context, "No me gusta :(", Toast.LENGTH_SHORT).show();
+                        holder.unItemLV.setBackgroundColor(Color.rgb(255, 198, 197));
                     }
 
 
@@ -240,7 +282,9 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         private View btnEdit;
         private SwipeLayout swipeLayout;
         private TextView nombreTV, direccionTV,precioTV1,precioTV2,precioTV3,precioTV4,precioTV5,estrellasTV;
+        private TextView Calidad1,Calidad2,Calidad3,Calidad4,Calidad5;
         private ImageView iconLike;
+        private LinearLayout unItemLV;
 
         public ViewHolder(View v) {
             nombreTV = (TextView) v.findViewById(R.id.nombre);
@@ -255,8 +299,14 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
             precioTV3 = (TextView)v.findViewById(R.id.txvwLVPrecio3);
             precioTV4 = (TextView)v.findViewById(R.id.txvwLVPrecio4);
             precioTV5 = (TextView)v.findViewById(R.id.txvwLVPrecio5);
-            estrellasTV = (TextView)v.findViewById(R.id.txvwLVestrellas);
+          //  estrellasTV = (TextView)v.findViewById(R.id.txvwLVestrellas);
+            Calidad1=(TextView)v.findViewById(R.id.Calidad1);
+            Calidad2=(TextView)v.findViewById(R.id.Calidad2);
+            Calidad3=(TextView)v.findViewById(R.id.Calidad3);
+            Calidad4=(TextView)v.findViewById(R.id.Calidad4);
+            Calidad5=(TextView)v.findViewById(R.id.Calidad5);
             iconLike = (ImageView)v.findViewById(R.id.icon_likeLV);
+            unItemLV=(LinearLayout)v.findViewById(R.id.un_item_listV);
 
             swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
         }

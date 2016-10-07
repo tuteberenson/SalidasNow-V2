@@ -8,19 +8,19 @@
             android:title="Import" />-->
         <item
             android:id="@+id/nav_recomendador"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_swap_calls_black_24dp"
             android:title="Recomendador" />
         <item
             android:id="@+id/nav_buscar_restaurantes"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_search_black_24dp"
             android:title="Buscar restaurante" />
         <item
         android:id="@+id/nav_likeados"
-        android:icon="@drawable/ic_menu_slideshow"
-        android:title="Likeados" />
+        android:icon="@drawable/ic_favorite_black_24dp"
+        android:title="Me gusta" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Opciones">
         <menu>
            <!-- <item
                 android:id="@+id/nav_share"

@@ -181,7 +181,7 @@ public class SignUpActivity extends AppCompatActivity {
         } else {
             _ApellidoText.setError(null);
         }
-        if (password.isEmpty() || password.length() < 4 || password.length() > 15) {
+        if (password.isEmpty() || password.length() < 5 || password.length() > 15) {
             _passwordText.setError("Entre 4 y 15 caracteres");
             valid = false;
         } else {

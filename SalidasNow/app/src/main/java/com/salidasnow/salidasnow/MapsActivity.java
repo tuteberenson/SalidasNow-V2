@@ -1,11 +1,15 @@
 package com.salidasnow.salidasnow;
 
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,7 +18,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -24,6 +36,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView txDireccion, txtestrellas;
     TextView prec1,prec2,prec3,prec4,prec5;
     ImageView imagenrestaurant;
+    ImageButton btnVolver, btnLike;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +56,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         textNombreResto =(TextView)findViewById(R.id.textNombreRestaurant);
 
-
+        btnLike=(ImageButton)findViewById(R.id.btn_like_map_activity);
+        btnVolver= (ImageButton)findViewById(R.id.btn_volver_map_activity);
         prec1 = (TextView)findViewById(R.id.Precio1);
         prec2 = (TextView)findViewById(R.id.Precio2);
         prec3 = (TextView)findViewById(R.id.Precio3);
@@ -59,15 +73,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         textNombreResto.setText( restaurantRecibido.get_Nombre());
 
 
+        btnVolver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              finish();
+            }
+        });
+
+
         if (restaurantRecibido!=null) {
 
+        if (restaurantRecibido.is_Likeado())
+        {
+            btnLike.setBackgroundColor(Color.rgb(164,0,0));
+            btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+        }
 
+            btnLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    int idUsuarioActual=ActividadPrincipal.usuarioActual.get_idUsuario();
+                    int idRestaurant=restaurantRecibido.get_IdRestaurant();
+                    String url = "http://salidasnow.hol.es/UsuariosRestaurantes/setLike.php?idUsuario="+idUsuarioActual+"&idRestaurant="+idRestaurant+"&like=1";
+                    new insertLikeAsync().execute(url);
+                }
+            });
             txDireccion.setText(restaurantRecibido.get_Direccion().trim());
             txtestrellas.setText("Estrellas: " + restaurantRecibido.get_Estrellas()+"");
-            Picasso.with(getApplicationContext())
+
+           Picasso.with(getApplicationContext())
                     .load("http://salidasnow.hol.es/images/"+ restaurantRecibido.get_IdRestaurant()+".jpg")
                     .fit()
                     .into(imagenrestaurant);
+
             switch (restaurantRecibido.get_Precio())
             {
                 case 1:
@@ -147,4 +186,92 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title(titulo);
         mMap.addMarker(mo);
     }
+    private class insertLikeAsync extends AsyncTask<String, Void,String>
+    {
+        private OkHttpClient client = new OkHttpClient();
+
+        @Override
+        protected String doInBackground(String... params) {
+            String url = params[0];
+            String resultado;
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try {
+                Response response=client.newCall(request).execute();
+
+                return response.body().string();
+            }
+            catch (IOException e)
+            {
+                Log.d("Error",e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String JsonResponse) {
+
+            int estado=0;
+            try {
+                estado = parsearResultado(JsonResponse);
+                if (estado== 1 || estado==3)
+                {
+                    if (btnLike.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_star_border_black_24dp).getConstantState())
+                    {
+                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                        Toast.makeText(MapsActivity.this, "Me gusta!", Toast.LENGTH_SHORT).show();
+                        restaurantRecibido.set_Likeado(true);
+                        btnLike.setBackgroundColor(Color.rgb(164,0,0));
+                    }
+                    else
+                    {
+                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
+                        Toast.makeText(MapsActivity.this, "No me gusta :(", Toast.LENGTH_SHORT).show();
+                        btnLike.setBackgroundColor(Color.rgb(196, 198, 197));
+                        restaurantRecibido.set_Likeado(false);
+                    }
+                }
+            }
+            catch (JSONException e)
+            {
+                Log.d("error",e.getMessage());
+            }
+            switch (estado)
+            {
+                case 0:
+                    Log.d("errorSwitch","Fue por el catch");
+                    break;
+                case 1:
+                    Log.d("ResultadoLike","Ya existia el like, se actualizo sin problemas");
+                    break;
+                case 2:
+                    Log.d("ResultadoLike","No se actualizo el registro");
+                    break;
+                case 3:
+                    Log.d("ResultadoLike","No existia el like, se creo sin problemas");
+                    break;
+                case 4:
+                    Log.d("ResultadoLike","No se creo el registro");
+                    break;
+                case 5:
+                    Log.d("ResultadoLike","Excepcion sql: "+ JsonResponse);
+                    break;
+                default:
+                    Log.d("errorSwitch","Ups");
+                    break;
+            }
+        }
+
+        private int parsearResultado(String string) throws JSONException
+        {
+            JSONObject json=new JSONObject(string);
+
+            return json.getInt("estado");
+        }
+
+    }
+
+
 }
