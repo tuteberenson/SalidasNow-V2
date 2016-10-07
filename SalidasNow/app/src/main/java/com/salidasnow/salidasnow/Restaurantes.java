@@ -11,6 +11,7 @@ public class Restaurantes implements Serializable {
     private int _IdRestaurant,_Precio, _Estrellas,_NumTelefono;
     private String _Nombre, _Direccion;
     private double _Latitud,_Longitud;
+    private boolean _Likeado;
 
     public Restaurantes()
     {
@@ -79,5 +80,13 @@ public class Restaurantes implements Serializable {
 
     public void set_Longitud(double _Longitud) {
         this._Longitud = _Longitud;
+    }
+
+    public boolean is_Likeado() {
+        return _Likeado;
+    }
+
+    public void set_Likeado(boolean _Likeado) {
+        this._Likeado = _Likeado;
     }
 }

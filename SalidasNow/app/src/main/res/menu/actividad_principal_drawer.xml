@@ -2,30 +2,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item
+      <!--  <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="Import" />-->
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_recomendador"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Recomendador" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_buscar_restaurantes"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Buscar restaurante" />
+        <item
+        android:id="@+id/nav_likeados"
+        android:icon="@drawable/ic_menu_slideshow"
+        android:title="Likeados" />
     </group>
 
     <item android:title="Communicate">
         <menu>
-            <item
+           <!-- <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Share" />-->
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_keyboard_backspace_black_24dp"

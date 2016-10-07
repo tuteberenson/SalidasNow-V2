@@ -7,13 +7,16 @@
     android:layout_height="match_parent"
     tools:context="com.salidasnow.salidasnow.ActividadPrincipal"
     tools:showIn="@layout/app_bar_actividad_principal">
-
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/FrameContenedor"
+    >
     <ListView
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="55dp"
         android:id="@+id/listVW_ActPrincipal">
     </ListView>
-
+</FrameLayout>
 </LinearLayout>

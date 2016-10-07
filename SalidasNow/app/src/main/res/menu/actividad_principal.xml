@@ -6,4 +6,11 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_random"
+        android:orderInCategory="1"
+        android:title="random"
+        android:icon="@drawable/ic_toc_black_24dp"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
 </menu>

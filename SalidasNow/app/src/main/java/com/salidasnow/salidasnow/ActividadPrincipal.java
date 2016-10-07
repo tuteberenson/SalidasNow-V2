@@ -5,11 +5,10 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+import android.app.FragmentManager;
+//import android.support.v4.app.Fragment;
+//import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,13 +21,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
-import com.google.android.gms.maps.model.LatLng;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -46,11 +45,14 @@ public class ActividadPrincipal extends AppCompatActivity
 
     TextView txVwNombre,txVwInfo;
     ImageView imgVwIcono;
-    Usuarios usuarioActual;
+   public static Usuarios usuarioActual;
     private ListView listView;
     private AdaptadorListViewRestaurantes adapter;
     private TextView totalClassmates;
     private SwipeLayout swipeLayout;
+    private boolean isStartup;
+    MenuItem itemAzar;
+    private ArrayList<Integer> mSelectedItems;
 
     private final static String TAG = ActividadPrincipal.class.getSimpleName();
 
@@ -60,6 +62,9 @@ public class ActividadPrincipal extends AppCompatActivity
         setContentView(R.layout.actividad_principal);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+        isStartup=true;
 
         listView=(ListView)findViewById(R.id.listVW_ActPrincipal);
 
@@ -74,20 +79,21 @@ public class ActividadPrincipal extends AppCompatActivity
         new TraerRestaurantes().execute(url);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -118,6 +124,7 @@ public class ActividadPrincipal extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.actividad_principal, menu);
+        itemAzar= menu.findItem(R.id.action_random);
         return true;
     }
 
@@ -132,6 +139,10 @@ public class ActividadPrincipal extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
+        else if (id == R.id.action_random)
+        {
+
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -140,19 +151,38 @@ public class ActividadPrincipal extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+
         int id = item.getItemId();
+        Fragment fragment = null;
+        Class fragmentClass = null;
 
-        if (id == R.id.nav_camera) {
+
+
+        if(isStartup) {
+            ((FrameLayout) findViewById(R.id.FrameContenedor)).removeAllViews();
+            isStartup = false;
+        }
+
+       /* if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else*/ if (id == R.id.nav_recomendador) {
+           fragment = new FragmentRecomendador();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+        } else if (id == R.id.nav_likeados) {
+           // fragmentClass = FragmentRestaurantesLikeados.class;
+            fragment = new FragmentRestaurantesLikeados();
+            itemAzar.setVisible(true);
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_buscar_restaurantes) {
+            fragment = new FragmentBuscarRestaurantes();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+        } /*else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_logout)
+        }*/ else if (id == R.id.nav_logout)
         {
             Generics generics=new Generics(ActividadPrincipal.this);
             SQLiteDatabase baseDeDatos;
@@ -169,6 +199,12 @@ public class ActividadPrincipal extends AppCompatActivity
                 finish();
             }
         }
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -195,23 +231,12 @@ public class ActividadPrincipal extends AppCompatActivity
             }
             if (!resultadoRestaurantes.isEmpty()) {
 
-                setListViewAdapter(resultadoRestaurantes);
-                setListViewHeader();
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                      if (position!=0)
-                      {
-                          Restaurantes unResto = resultadoRestaurantes.get(position-1);
-                          Log.d("Test", "00");
-                          Log.d("Test", resultadoRestaurantes.get(position-1) + "");
-                          Intent mapActivity = new Intent(ActividadPrincipal.this, MapsActivity.class);
+                String url;
+                url="http://salidasnow.hol.es/UsuariosRestaurantes/obtener_IdRestaurant_byUsuario.php?idUsuario="+ActividadPrincipal.usuarioActual.get_idUsuario();
+                Log.d(TAG,url);
 
-                          mapActivity.putExtra("Restaurant", unResto);
-                          startActivity(mapActivity);
-                      }
-                    }
-                });
+                MyTaskParams params = new MyTaskParams(url,resultadoRestaurantes);
+               new RestaurantesLikeados().execute(params);
 
             } else {
                 Toast.makeText(ActividadPrincipal.this, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
@@ -234,7 +259,7 @@ public class ActividadPrincipal extends AppCompatActivity
                 return arrayRestaurantes;
 
             } catch (IOException | JSONException e) {
-                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
+                Log.d("Error1", e.getMessage());                          // Error de Network o al parsear JSON
                 return arrayRestaurantes;
             }
         }
@@ -288,6 +313,113 @@ public class ActividadPrincipal extends AppCompatActivity
             return RestaurantArrayList;
         }
     }
+    private static class MyTaskParams {
+      String url;
+        ArrayList<Restaurantes> listaRestaurantes;
+
+        MyTaskParams(String url, ArrayList<Restaurantes> lista) {
+            this.url = url;
+            this.listaRestaurantes =lista;
+
+        }
+    }
+    private class RestaurantesLikeados extends AsyncTask<MyTaskParams, Void, ArrayList<Restaurantes>>
+    {
+        private OkHttpClient client = new OkHttpClient();
+        @Override
+        protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
+
+
+                setListViewAdapter(listaRestos);
+                setListViewHeader();
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        if (position != 0) {
+                            Restaurantes unResto = listaRestos.get(position - 1);
+                            Log.d("Test", "00");
+                            Log.d("Test", listaRestos.get(position - 1) + "");
+                            Intent mapActivity = new Intent(ActividadPrincipal.this, MapsActivity.class);
+
+                            mapActivity.putExtra("Restaurant", unResto);
+                            startActivity(mapActivity);
+                        }
+                    }
+                });
+
+            super.onPostExecute(listaRestos);
+
+        }
+
+        @Override
+        protected ArrayList<Restaurantes> doInBackground(MyTaskParams... params) {
+            String url = params[0].url;
+            ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
+
+            Log.d("url doInB Precio", url);
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                arrayRestaurantes = parsearResultado(response.body().string(),params[0].listaRestaurantes);
+
+
+                return arrayRestaurantes;
+
+            } catch (IOException | JSONException e) {
+                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
+                return arrayRestaurantes;
+            }
+
+        }
+        ArrayList<Restaurantes> parsearResultado(String JSONstr, ArrayList<Restaurantes> listaRestos) throws JSONException {
+            // ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
+            boolean flag=false;
+
+            JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
+            //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
+
+
+            if (json.getInt("estado")==1) {
+                JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
+
+                int condicion;
+                if (jsonRestaurantes.length() > 100) {
+                    condicion = 100;
+                } else {
+                    condicion = jsonRestaurantes.length();
+                }
+
+                for (Restaurantes unResta : listaRestos) {
+
+                    unResta.set_Likeado(false);
+                }
+
+                for (int i = 0; i < condicion; i++) {
+
+                    flag = false;
+                    JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
+
+                    int jsonIdRestaurant = jsonResultado.getInt("idRestaurant");
+                    int PosicionRestaurant = -1;
+
+                    for (Restaurantes unResto : listaRestos) {
+                        if (unResto.get_IdRestaurant() == jsonIdRestaurant) {
+                            PosicionRestaurant=listaRestos.indexOf(unResto);
+                            flag = true;
+                            listaRestos.get(PosicionRestaurant).set_Likeado(true);
+                            listaRestos.set(PosicionRestaurant, listaRestos.get(PosicionRestaurant));
+                        }
+                    }
+                }
+
+
+            }
+            return listaRestos;
+        }
+    }
         private void setListViewHeader() {
             LayoutInflater inflater = getLayoutInflater();
             View header = inflater.inflate(R.layout.header_listview, listView, false);
@@ -339,14 +471,16 @@ public class ActividadPrincipal extends AppCompatActivity
         }
 
         private void setListViewAdapter(ArrayList<Restaurantes>lista) {
-            adapter = new AdaptadorListViewRestaurantes(ActividadPrincipal.this,R.layout.list_item_restaurant, lista, usuarioActual);
+            adapter = new AdaptadorListViewRestaurantes(ActividadPrincipal.this,R.layout.list_item_restaurant, lista, usuarioActual,2);
             listView.setAdapter(adapter);
 
             //totalClassmates.setText("Restaurantes");
         }
 
-      /*  public void updateAdapter() {
+        public void updateAdapter() {
             adapter.notifyDataSetChanged(); //update adapter
-            totalClassmates.setText("(" + friendsList.size() + ")"); //update total friends in list
-        }*/
+            totalClassmates.setText(" "); //update total friends in list
+        }
+
+
 }
