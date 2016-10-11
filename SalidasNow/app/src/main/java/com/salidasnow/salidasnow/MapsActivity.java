@@ -16,11 +16,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.internal.IGoogleMapDelegate;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.internal.http.CacheStrategy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -37,6 +39,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView prec1,prec2,prec3,prec4,prec5;
     ImageView imagenrestaurant;
     ImageButton btnVolver, btnLike;
+    String FragmentQueLlama;
+    int PosicionRestaurantEnLista;
+
+    TextView Calidad1,Calidad2,Calidad3,Calidad4,Calidad5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.actividad_mapa);
 
         restaurantRecibido =(Restaurantes)getIntent().getSerializableExtra("Restaurant");
+
+        FragmentQueLlama= getIntent().getStringExtra("FragmentLlamador");
+        PosicionRestaurantEnLista = getIntent().getIntExtra("PosicionRestaurantLista",-1);
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -63,11 +73,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         prec3 = (TextView)findViewById(R.id.Precio3);
         prec4 = (TextView)findViewById(R.id.Precio4);
         prec5 = (TextView)findViewById(R.id.Precio5);
+        Calidad1=(TextView)findViewById(R.id.Calidad1);
+        Calidad2=(TextView)findViewById(R.id.Calidad2);
+        Calidad3=(TextView)findViewById(R.id.Calidad3);
+        Calidad4=(TextView)findViewById(R.id.Calidad4);
+        Calidad5=(TextView)findViewById(R.id.Calidad5);
         imagenrestaurant = (ImageView)findViewById(R.id.imgrestaurant);
 
-        txDireccion = (TextView)findViewById(R.id.direc);
+        txDireccion = (TextView)findViewById(R.id.direcMapActivity);
 
-        txtestrellas = (TextView) findViewById(R.id.txtestrellas);
+        //txtestrellas = (TextView) findViewById(R.id.txtestrellas);
 
 
         textNombreResto.setText( restaurantRecibido.get_Nombre());
@@ -76,6 +91,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final String FLikeados = FragmentRestaurantesLikeados.class.getSimpleName().toString();
+                String FRecomendador = FragmentRecomendador.class.getSimpleName().toString();
+                String FBuscarRestaurantes= FragmentBuscarRestaurantes.class.getSimpleName().toString();
+                String FAlAzar= FragmentRestaurantesAzar.class.getSimpleName().toString();
+                if (FLikeados.equals(FragmentQueLlama))
+                {
+                    if (PosicionRestaurantEnLista!=-1) {
+                        FragmentRestaurantesLikeados.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                        FragmentRestaurantesLikeados.adapter.notifyDataSetChanged();
+                    }
+                }
+                else if (FRecomendador.equals(FragmentQueLlama))
+                {
+                    if (PosicionRestaurantEnLista!=-1) {
+                        FragmentRecomendador.listaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                        FragmentRecomendador.adapter.notifyDataSetChanged();
+                    }
+                }
+                else if(FBuscarRestaurantes.equals(FragmentQueLlama))
+                {
+                    if (PosicionRestaurantEnLista!=-1) {
+                        FragmentBuscarRestaurantes.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                        FragmentBuscarRestaurantes.adapter.notifyDataSetChanged();
+                    }
+                }
+                else if (FAlAzar.equals(FragmentQueLlama))
+                {
+                    if (PosicionRestaurantEnLista!=-1) {
+                        FragmentRestaurantesAzar.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                        FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
+                    }
+                }
+
               finish();
             }
         });
@@ -100,7 +148,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
             txDireccion.setText(restaurantRecibido.get_Direccion().trim());
-            txtestrellas.setText("Estrellas: " + restaurantRecibido.get_Estrellas()+"");
+            //txtestrellas.setText("Estrellas: " + restaurantRecibido.get_Estrellas()+"");
+
+            switch (restaurantRecibido.get_Estrellas()) {
+                case 1:
+                     Calidad1.setText("★");
+                     Calidad2.setText("☆");
+                     Calidad3.setText("☆");
+                     Calidad4.setText("☆");
+                     Calidad5.setText("☆");
+                    break;
+                case 2:
+                     Calidad1.setText("★");
+                     Calidad2.setText("★");
+                     Calidad3.setText("☆");
+                     Calidad4.setText("☆");
+                     Calidad5.setText("☆");
+                    break;
+                case 3:
+                     Calidad1.setText("★");
+                     Calidad2.setText("★");
+                     Calidad3.setText("★");
+                     Calidad4.setText("☆");
+                     Calidad5.setText("☆");
+                    break;
+                case 4:
+                     Calidad1.setText("★");
+                     Calidad2.setText("★");
+                     Calidad3.setText("★");
+                     Calidad4.setText("★");
+                     Calidad5.setText("☆");
+                    break;
+                case 5:
+                     Calidad1.setText("★");
+                     Calidad2.setText("★");
+                     Calidad3.setText("★");
+                     Calidad4.setText("★");
+                     Calidad5.setText("★");
+                    break;
+            }
 
            Picasso.with(getApplicationContext())
                     .load("http://salidasnow.hol.es/images/"+ restaurantRecibido.get_IdRestaurant()+".jpg")

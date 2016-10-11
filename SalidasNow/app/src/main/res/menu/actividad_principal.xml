@@ -13,4 +13,11 @@
         android:icon="@drawable/ic_toc_black_24dp"
         app:showAsAction="ifRoom"
         android:visible="false"/>
+    <item
+        android:id="@+id/action_select_search"
+        android:orderInCategory="1"
+        android:title="select"
+        android:icon="@drawable/ic_toc_black_24dp"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
 </menu>

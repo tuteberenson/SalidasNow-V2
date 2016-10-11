@@ -3,7 +3,6 @@ package com.salidasnow.salidasnow;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -86,6 +85,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
 
         Log.d("Contexto",context+"");
         Restaurantes p = this.restaurants.get(position);
+        Log.d("UnResto", "Nombre: "+p.get_Nombre() + " Likeado: "+p.is_Likeado());
         holder.nombreTV.setText(p.get_Nombre());
         holder.direccionTV.setText(p.get_Direccion());
         switch (p.get_Precio()) {
@@ -178,6 +178,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         else
         {
             holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
+            holder.unItemLV.setBackgroundColor(Color.rgb(255,255, 255));
         }
 
         return convertView;
@@ -201,19 +202,27 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                     new insertLikeAsync().execute(url);
 
 
+                for (Restaurantes unResto:restaurants)
+                {
+                    if (unResto.get_IdRestaurant() == restaurants.get(position).get_IdRestaurant())
+                    {
+                        if (holder.iconLike.getDrawable().getConstantState() == context.getResources().getDrawable(R.drawable.ic_star_border_black_24dp).getConstantState())
+                        {
+                            holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                            Toast.makeText(context, "Me gusta!", Toast.LENGTH_SHORT).show();
+                            holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
+                            restaurants.get(position).set_Likeado(true);
+                        }
+                        else
+                        {
+                            holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
+                            Toast.makeText(context, "No me gusta :(", Toast.LENGTH_SHORT).show();
+                            holder.unItemLV.setBackgroundColor(Color.rgb(255, 198, 197));
+                            restaurants.get(position).set_Likeado(false);
+                        }
+                    }
+                }
 
-                    if (holder.iconLike.getDrawable().getConstantState() == context.getResources().getDrawable(R.drawable.ic_star_border_black_24dp).getConstantState())
-                    {
-                        holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                        Toast.makeText(context, "Me gusta!", Toast.LENGTH_SHORT).show();
-                        holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
-                    }
-                    else
-                    {
-                        holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
-                        Toast.makeText(context, "No me gusta :(", Toast.LENGTH_SHORT).show();
-                        holder.unItemLV.setBackgroundColor(Color.rgb(255, 198, 197));
-                    }
 
 
                 //}
@@ -293,7 +302,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                 btnDelete = v.findViewById(R.id.delete);
             }
             btnEdit = v.findViewById(R.id.icon_likeLV);
-            direccionTV = (TextView)v.findViewById(R.id.direc);
+            direccionTV = (TextView)v.findViewById(R.id.direcMapActivity);
             precioTV1 = (TextView)v.findViewById(R.id.txvwLVPrecio1);
             precioTV2 = (TextView)v.findViewById(R.id.txvwLVPrecio2);
             precioTV3 = (TextView)v.findViewById(R.id.txvwLVPrecio3);

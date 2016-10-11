@@ -1,15 +1,11 @@
 package com.salidasnow.salidasnow;
 
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-//import android.support.v4.app.Fragment;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,30 +26,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.HttpRetryException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FragmentRestaurantesLikeados extends Fragment {
+public class FragmentRestaurantesAzar extends Fragment {
 
     Context thisContext;
-    ListView listView;
+    private ListView listView;
     public static AdaptadorListViewRestaurantes adapter;
     private TextView totalClassmates;
     private SwipeLayout swipeLayout;
+    private final static String TAG = FragmentRestaurantesAzar.class.getSimpleName();
     public static ArrayList<Restaurantes> gListaRestaurantes;
 
-
-    private final static String TAG = FragmentRestaurantesLikeados.class.getSimpleName();
-
-
-    public FragmentRestaurantesLikeados() {
+    public FragmentRestaurantesAzar() {
         // Required empty public constructor
     }
 
@@ -62,14 +52,14 @@ public class FragmentRestaurantesLikeados extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View vista = inflater.inflate(R.layout.fragment_restaurantes_likeados, container, false);
+        View vista =inflater.inflate(R.layout.fragment_restaurantes_azar, container, false);
 
+        gListaRestaurantes=new ArrayList<>();
+
+        listView = (ListView)vista.findViewById(R.id.listVW_F_Azar);
         thisContext = container.getContext();
-        listView = (ListView) vista.findViewById(R.id.listVW_Likeados);
 
-        gListaRestaurantes = new ArrayList<>();
-
-        String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byLikes.php?idUsuario="+ActividadPrincipal.usuarioActual.get_idUsuario();
+        String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantsRDM.php";
         new TraerRestaurantes().execute(url);
 
         return vista;
@@ -82,7 +72,7 @@ public class FragmentRestaurantesLikeados extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            this.dialog.setMessage("Espere por favor");
+            this.dialog.setMessage("Please wait");
             this.dialog.show();
         }
 
@@ -104,7 +94,7 @@ public class FragmentRestaurantesLikeados extends Fragment {
                 new RestaurantesLikeados().execute(params);
 
             } else {
-                Toast.makeText(thisContext, "No le gusta ningún restaurant", Toast.LENGTH_SHORT).show();
+                Toast.makeText(thisContext, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -124,7 +114,7 @@ public class FragmentRestaurantesLikeados extends Fragment {
                 return arrayRestaurantes;
 
             } catch (IOException | JSONException e) {
-                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
+                Log.d("Error1", e.getMessage());                          // Error de Network o al parsear JSON
                 return arrayRestaurantes;
             }
         }
@@ -139,8 +129,8 @@ public class FragmentRestaurantesLikeados extends Fragment {
             JSONArray jsonRestaurantes = json.getJSONArray("restaurants");
 
             int condicion;
-            if (jsonRestaurantes.length() > 30) {
-                condicion = 30;
+            if (jsonRestaurantes.length() > 10) {
+                condicion = 10;
             } else {
                 condicion = jsonRestaurantes.length();
             }
@@ -159,7 +149,7 @@ public class FragmentRestaurantesLikeados extends Fragment {
                 double jsonLongitud = (double) jsonResultado.getDouble("Longitud");
 
                 Log.d("parsearResulRes", "Nombre: " + jsonNombre + " Direccion: " + jsonDireccion);
-                Log.d("latLng", "Lat: " + jsonLatitud + " Lng: " + jsonLongitud);
+                Log.d("latLng","Lat: "+ jsonLatitud+ " Lng: "+jsonLongitud);
 
                 Restaurantes re = new Restaurantes();
                 re.set_Precio(jsonPrecio);
@@ -171,9 +161,7 @@ public class FragmentRestaurantesLikeados extends Fragment {
                 re.set_Direccion(jsonDireccion);
                 re.set_IdRestaurant(jsonId);
 
-
                 RestaurantArrayList.add(re);                                                 // Agrego objeto d al array list
-
             }
             return RestaurantArrayList;
         }
@@ -194,17 +182,17 @@ public class FragmentRestaurantesLikeados extends Fragment {
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
+
             gListaRestaurantes.addAll(listaRestos);
             setListViewAdapter(gListaRestaurantes);
             setListViewHeader();
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (position!=0)
-                    {
-                        Restaurantes unResto = gListaRestaurantes.get(position-1);
+                    if (position != 0) {
+                        Restaurantes unResto = listaRestos.get(position - 1);
                         Log.d("Test", "00");
-                        Log.d("Test", gListaRestaurantes.get(position-1) + "");
+                        Log.d("Test", listaRestos.get(position - 1) + "");
                         Intent mapActivity = new Intent(thisContext, MapsActivity.class);
 
                         mapActivity.putExtra("PosicionRestaurantLista",position-1);
@@ -232,6 +220,7 @@ public class FragmentRestaurantesLikeados extends Fragment {
             try {
                 Response response = client.newCall(request).execute();
                 arrayRestaurantes = parsearResultado(response.body().string(),params[0].listaRestaurantes);
+
 
                 return arrayRestaurantes;
 
@@ -287,14 +276,13 @@ public class FragmentRestaurantesLikeados extends Fragment {
             return listaRestos;
         }
     }
-
     private void setListViewHeader() {
-        LayoutInflater inflater = LayoutInflater.from(thisContext);
+        LayoutInflater inflater =LayoutInflater.from(thisContext);
         View header = inflater.inflate(R.layout.header_listview, listView, false);
         totalClassmates = (TextView) header.findViewById(R.id.total);
-        swipeLayout = (SwipeLayout) header.findViewById(R.id.swipe_layout);
+        swipeLayout = (SwipeLayout)header.findViewById(R.id.swipe_layout);
         setSwipeViewFeatures(header);
-        totalClassmates.setText("Restaurantes likeados");
+        totalClassmates.setText("Restaurantes");
         listView.addHeaderView(header);
     }
 
@@ -338,24 +326,16 @@ public class FragmentRestaurantesLikeados extends Fragment {
         });
     }
 
-    private void setListViewAdapter(ArrayList<Restaurantes> lista) {
-
-        Log.d("UsuarioEnLikeados", ActividadPrincipal.usuarioActual.get_Nombre());
-        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,1);
+    private void setListViewAdapter(ArrayList<Restaurantes>lista) {
+        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,2);
         listView.setAdapter(adapter);
 
         //totalClassmates.setText("Restaurantes");
     }
 
-
-      /*  public void updateAdapter() {
-            adapter.notifyDataSetChanged(); //update adapter
-            totalClassmates.setText("(" + friendsList.size() + ")"); //update total friends in list
-        }*/
-
-
-
-
-
+    public void updateAdapter() {
+        adapter.notifyDataSetChanged(); //update adapter
+        totalClassmates.setText(" "); //update total friends in list
+    }
 
 }

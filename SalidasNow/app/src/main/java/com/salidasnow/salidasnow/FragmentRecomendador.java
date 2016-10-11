@@ -1,8 +1,11 @@
 package com.salidasnow.salidasnow;
 
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +32,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 
@@ -44,8 +49,10 @@ public class FragmentRecomendador extends Fragment {
     Button btnMasOpciones, btnRecomendame;
     ArrayList<Indicadores> gArrayIndicadores,indicadoresAlAzar;
     ListView listView;
-    AdaptadorListViewRestaurantes adapter;
+    public static AdaptadorListViewRestaurantes adapter;
     boolean setearLVHeader;
+    String seleccionCalidad,seleccionPrecio,seleccionAmbientacion;
+   public static ArrayList<Restaurantes> listaRestaurantes;
 
     private final static String TAG = FragmentRecomendador.class.getSimpleName();
 
@@ -60,6 +67,7 @@ public class FragmentRecomendador extends Fragment {
         // Inflate the layout for this fragment
         View vista = inflater.inflate(R.layout.fragment_recomendador, container, false);
 
+        listaRestaurantes=new ArrayList<>();
         setearLVHeader=true;
 
         thisContext=container.getContext();
@@ -374,105 +382,94 @@ public class FragmentRecomendador extends Fragment {
             }
             if (!resultadoRestaurants.isEmpty()) {
 
-               // gListaRestaurantes.addAll(resultadoRestaurantes);
-                setListViewAdapter(resultadoRestaurants);
-               if (setearLVHeader) {
-                   setListViewHeader();
-               setearLVHeader=false;
-               }
+                if (!resultadoRestaurants.isEmpty()) {
 
 
+                    String url;
+                    url = "http://salidasnow.hol.es/UsuariosRestaurantes/obtener_IdRestaurant_byUsuario.php?idUsuario=" + ActividadPrincipal.usuarioActual.get_idUsuario();
+                    Log.d(TAG, url);
 
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if (position != 0) {
-                            Restaurantes unResto = resultadoRestaurants.get(position - 1);
-                            Log.d("Test", "00");
-                            Log.d("Test", resultadoRestaurants.get(position - 1) + "");
-                            Intent mapActivity = new Intent(thisContext, MapsActivity.class);
+                    MyTaskParams params = new MyTaskParams(url, resultadoRestaurants);
+                    new RestaurantesLikeados().execute(params);
 
-                            mapActivity.putExtra("Restaurant", unResto);
-                            startActivity(mapActivity);
-                        }
-                    }
-                });
+                } else {
+                    Toast.makeText(thisContext, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+            @Override
+            protected ArrayList<Restaurantes> doInBackground (String...params){
+                String url = params[0];
 
-            } else {
-                Toast.makeText(thisContext, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
+                Log.d("url doInB Precio", url);
+                ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    arrayRestaurantes = parsearResultadoRestosPrecio(response.body().string());
+
+                    return arrayRestaurantes;
+
+                } catch (IOException | JSONException e) {
+                    Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
+                    return arrayRestaurantes;
+                }
+            }
+
+
+            ArrayList<Restaurantes> parsearResultadoRestosPrecio (String JSONstr)throws
+            JSONException {
+                ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
+
+                JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
+                //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
+
+                JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
+
+                int condicion;
+                if (jsonRestaurantes.length() > 10) {
+                    condicion = 10;
+                } else {
+                    condicion = jsonRestaurantes.length();
+                }
+
+                for (int i = 0; i < condicion; i++) {
+
+                    JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
+
+                    int jsonId = jsonResultado.getInt("idRestaurant");
+                    String jsonNombre = jsonResultado.getString("Nombre");
+                    String jsonDireccion = jsonResultado.getString("Direccion");
+                    int jsonPrecio = jsonResultado.getInt("Precio");
+                    int jsonEstrellas = jsonResultado.getInt("Estrellas");
+                    int jsonNumeroTel = jsonResultado.getInt("NumeroTelefono");
+                    double jsonLatitud = (double) jsonResultado.getDouble("Latitud");
+                    double jsonLongitud = (double) jsonResultado.getDouble("Longitud");
+
+                    Log.d("parsearResulRes", "Nombre: " + jsonNombre + " Direccion: " + jsonDireccion);
+                    Log.d("latLng", "Lat: " + jsonLatitud + " Lng: " + jsonLongitud);
+
+                    Restaurantes re = new Restaurantes();
+                    re.set_Precio(jsonPrecio);
+                    re.set_Nombre(jsonNombre);
+                    re.set_NumTelefono(jsonNumeroTel);
+                    re.set_Latitud(jsonLatitud);
+                    re.set_Longitud(jsonLongitud);
+                    re.set_Estrellas(jsonEstrellas);
+                    re.set_Direccion(jsonDireccion);
+                    re.set_IdRestaurant(jsonId);
+
+
+                    RestaurantArrayList.add(re);
+
+                }
+                return RestaurantArrayList;
             }
         }
 
-        @Override
-        protected ArrayList<Restaurantes> doInBackground(String... params) {
-            String url = params[0];
 
-            Log.d("url doInB Precio", url);
-            ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-                arrayRestaurantes = parsearResultadoRestosPrecio(response.body().string());
-
-                return arrayRestaurantes;
-
-            } catch (IOException | JSONException e) {
-                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
-                return arrayRestaurantes;
-            }
-        }
-
-
-        ArrayList<Restaurantes> parsearResultadoRestosPrecio(String JSONstr) throws JSONException {
-            ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
-
-            JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
-            //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
-
-            JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
-
-            int condicion;
-            if (jsonRestaurantes.length() > 10) {
-                condicion = 10;
-            } else {
-                condicion = jsonRestaurantes.length();
-            }
-
-            for (int i = 0; i < condicion; i++) {
-
-                JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
-
-                int jsonId = jsonResultado.getInt("idRestaurant");
-                String jsonNombre = jsonResultado.getString("Nombre");
-                String jsonDireccion = jsonResultado.getString("Direccion");
-                int jsonPrecio = jsonResultado.getInt("Precio");
-                int jsonEstrellas = jsonResultado.getInt("Estrellas");
-                int jsonNumeroTel = jsonResultado.getInt("NumeroTelefono");
-                double jsonLatitud = (double) jsonResultado.getDouble("Latitud");
-                double jsonLongitud = (double) jsonResultado.getDouble("Longitud");
-
-                Log.d("parsearResulRes", "Nombre: " + jsonNombre + " Direccion: " + jsonDireccion);
-                Log.d("latLng", "Lat: " + jsonLatitud + " Lng: " + jsonLongitud);
-
-                Restaurantes re = new Restaurantes();
-                re.set_Precio(jsonPrecio);
-                re.set_Nombre(jsonNombre);
-                re.set_NumTelefono(jsonNumeroTel);
-                re.set_Latitud(jsonLatitud);
-                re.set_Longitud(jsonLongitud);
-                re.set_Estrellas(jsonEstrellas);
-                re.set_Direccion(jsonDireccion);
-                re.set_IdRestaurant(jsonId);
-
-
-                RestaurantArrayList.add(re);
-
-            }
-            return RestaurantArrayList;
-        }
-    }
     private void setListViewHeader() {
         LayoutInflater inflater = LayoutInflater.from(thisContext);
         View header = inflater.inflate(R.layout.header_listview, listView, false);
@@ -529,4 +526,257 @@ public class FragmentRecomendador extends Fragment {
 
         //totalClassmates.setText("Restaurantes");
     }
+    private static class MyTaskParams {
+        String url;
+        ArrayList<Restaurantes> listaRestaurantes;
+
+        MyTaskParams(String url, ArrayList<Restaurantes> lista) {
+            this.url = url;
+            this.listaRestaurantes =lista;
+
+        }
+    }
+    private class RestaurantesLikeados extends AsyncTask<MyTaskParams, Void, ArrayList<Restaurantes>>
+    {
+        private OkHttpClient client = new OkHttpClient();
+        @Override
+        protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
+
+
+            listaRestaurantes.addAll(listaRestos);
+
+            setListViewAdapter(listaRestaurantes);
+            //setListViewHeader();
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        Restaurantes unResto = listaRestaurantes.get(position);
+                        Log.d("Test", "00");
+                        Log.d("Test", listaRestaurantes.get(position) + "");
+                        Intent mapActivity = new Intent(thisContext, MapsActivity.class);
+
+                        mapActivity.putExtra("PosicionRestaurantLista",position);
+                        mapActivity.putExtra("FragmentLlamador",TAG);
+                        mapActivity.putExtra("Restaurant", unResto);
+                        startActivity(mapActivity);
+
+                }
+            });
+
+            super.onPostExecute(listaRestos);
+
+        }
+
+        @Override
+        protected ArrayList<Restaurantes> doInBackground(MyTaskParams... params) {
+            String url = params[0].url;
+            ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
+
+            Log.d("url doInB Precio", url);
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                arrayRestaurantes = parsearResultado(response.body().string(),params[0].listaRestaurantes);
+
+
+                return arrayRestaurantes;
+
+            } catch (IOException | JSONException e) {
+                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
+                return arrayRestaurantes;
+            }
+
+        }
+        ArrayList<Restaurantes> parsearResultado(String JSONstr, ArrayList<Restaurantes> listaRestos) throws JSONException {
+            // ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
+            boolean flag=false;
+
+            JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
+            //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
+
+
+            if (json.getInt("estado")==1) {
+                JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
+
+                int condicion;
+                if (jsonRestaurantes.length() > 100) {
+                    condicion = 100;
+                } else {
+                    condicion = jsonRestaurantes.length();
+                }
+
+                for (Restaurantes unResta : listaRestos) {
+
+                    unResta.set_Likeado(false);
+                }
+
+                for (int i = 0; i < condicion; i++) {
+
+                    flag = false;
+                    JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
+
+                    int jsonIdRestaurant = jsonResultado.getInt("idRestaurant");
+                    int PosicionRestaurant = -1;
+
+                    for (Restaurantes unResto : listaRestos) {
+                        if (unResto.get_IdRestaurant() == jsonIdRestaurant) {
+                            PosicionRestaurant=listaRestos.indexOf(unResto);
+                            flag = true;
+                            listaRestos.get(PosicionRestaurant).set_Likeado(true);
+                            listaRestos.set(PosicionRestaurant, listaRestos.get(PosicionRestaurant));
+                        }
+                    }
+                }
+
+
+            }
+            return listaRestos;
+        }
+    }
+    public Dialog onCreateDialogSingleChoiceCalidad() {
+
+//Initialize the Alert Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+//Source of the data in the DIalog
+        String[] array = {"Baja", "Media", "Alta"};
+
+        final List<String> optionsList = Arrays.asList(array);
+// Set the dialog title
+        builder.setTitle("Buscar por...")
+// Specify the list array, the items to be selected by default (null for none),
+// and the listener through which to receive callbacks when items are selected
+                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+// TODO Auto-generated method stub
+                        seleccionCalidad = optionsList.get(which);
+
+                        Log.d("currentItem",seleccionCalidad);
+                        // Notify the current action
+                        Toast.makeText(thisContext,
+                                seleccionCalidad, Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+
+// Set the action buttons
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+// User clicked OK, so save the result somewhere
+// or return them to the component that opened the dialog
+                        Dialog dialogo = onCreateDialogSingleChoicePrecio();
+                        dialogo.show();
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+        return builder.create();
+    }
+    public Dialog onCreateDialogSingleChoicePrecio() {
+
+//Initialize the Alert Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+//Source of the data in the DIalog
+        String[] array = {"Bajo", "Medio", "Alto"};
+
+        final List<String> optionsList = Arrays.asList(array);
+// Set the dialog title
+        builder.setTitle("Buscar por...")
+// Specify the list array, the items to be selected by default (null for none),
+// and the listener through which to receive callbacks when items are selected
+                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+// TODO Auto-generated method stub
+                        seleccionPrecio = optionsList.get(which);
+
+                        Log.d("currentItem",seleccionPrecio);
+                        // Notify the current action
+                        Toast.makeText(thisContext,
+                                seleccionPrecio, Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+
+// Set the action buttons
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+// User clicked OK, so save the result somewhere
+// or return them to the component that opened the dialog
+                        Dialog dialogo = onCreateDialogSingleChoiceAmbientacion();
+                        dialogo.show();
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+        return builder.create();
+    }
+    public Dialog onCreateDialogSingleChoiceAmbientacion() {
+
+//Initialize the Alert Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+//Source of the data in the DIalog
+        String[] array = {"Baja", "Media", "Alta"};
+
+        final List<String> optionsList = Arrays.asList(array);
+// Set the dialog title
+        builder.setTitle("Buscar por...")
+// Specify the list array, the items to be selected by default (null for none),
+// and the listener through which to receive callbacks when items are selected
+                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+// TODO Auto-generated method stub
+                        seleccionAmbientacion = optionsList.get(which);
+
+                        Log.d("currentItem",seleccionAmbientacion);
+                        // Notify the current action
+                        Toast.makeText(thisContext,
+                                seleccionAmbientacion, Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+
+// Set the action buttons
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+// User clicked OK, so save the result somewhere
+// or return them to the component that opened the dialog
+
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+        return builder.create();
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.salidasnow.salidasnow;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import com.daimajia.swipe.SwipeLayout;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.internal.io.FileSystem;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -41,6 +43,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.spncalidad;
+import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.spnprecio;
+import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.txtnombre;
 
 public class ActividadPrincipal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,13 +56,11 @@ public class ActividadPrincipal extends AppCompatActivity
     TextView txVwNombre,txVwInfo;
     ImageView imgVwIcono;
    public static Usuarios usuarioActual;
-    private ListView listView;
-    private AdaptadorListViewRestaurantes adapter;
-    private TextView totalClassmates;
-    private SwipeLayout swipeLayout;
+
     private boolean isStartup;
-    MenuItem itemAzar;
+    MenuItem itemAzar, itemSearch;
     private ArrayList<Integer> mSelectedItems;
+    String opcionSeleccionadaBuscarRestaurantes;
 
     private final static String TAG = ActividadPrincipal.class.getSimpleName();
 
@@ -66,10 +72,7 @@ public class ActividadPrincipal extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         isStartup=true;
-
-        listView=(ListView)findViewById(R.id.listVW_ActPrincipal);
 
         Bundle paquete;
         paquete=new Bundle();
@@ -77,10 +80,6 @@ public class ActividadPrincipal extends AppCompatActivity
         usuarioActual=new Usuarios();
         paquete = getIntent().getExtras();
         usuarioActual = (Usuarios)paquete.get("usuario");
-
-        String url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantsRDM.php";
-        new TraerRestaurantes().execute(url);
-
 
        /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +110,13 @@ public class ActividadPrincipal extends AppCompatActivity
                 .into(imgVwIcono);
         txVwNombre.setText(usuarioActual.get_Nombre()+" "+usuarioActual.get_Apellido());
         txVwInfo.setText("Username: " + usuarioActual.get_Username());
+
+        Fragment fragment;
+
+        fragment = new FragmentRestaurantesAzar();
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+
     }
 
     @Override
@@ -121,8 +127,8 @@ public class ActividadPrincipal extends AppCompatActivity
         } else {
             new AlertDialog.Builder(this)
                     .setIcon(R.drawable.ic_pan_tool_black_24dp)
-                    .setTitle("¿Cerrar?")
-                    .setMessage("El tren de SalidasNow pasa una sola vez en la vida ¿Quere salir?")
+                    .setTitle("Salir")
+                    .setMessage("¿Estás seguro?")
                     .setPositiveButton("Sí", new DialogInterface.OnClickListener()
                     {
                         @Override
@@ -142,6 +148,7 @@ public class ActividadPrincipal extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.actividad_principal, menu);
         itemAzar= menu.findItem(R.id.action_random);
+        itemSearch=menu.findItem(R.id.action_select_search);
         return true;
     }
 
@@ -159,6 +166,11 @@ public class ActividadPrincipal extends AppCompatActivity
         else if (id == R.id.action_random)
         {
 
+        }
+        else if (id == R.id.action_select_search)
+        {
+            Dialog dialog = onCreateDialogSingleChoice();
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -180,15 +192,22 @@ public class ActividadPrincipal extends AppCompatActivity
             isStartup = false;
         }
 
-       /* if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else*/ if (id == R.id.nav_recomendador) {
+        if (id == R.id.nav_Azar) {
+            fragment = new FragmentRestaurantesAzar();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+            itemSearch.setVisible(false);
+            itemAzar.setVisible(false);
+        } else if (id == R.id.nav_recomendador) {
            fragment = new FragmentRecomendador();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+            itemSearch.setVisible(false);
+            itemAzar.setVisible(false);
         } else if (id == R.id.nav_likeados) {
            // fragmentClass = FragmentRestaurantesLikeados.class;
             fragment = new FragmentRestaurantesLikeados();
+            itemSearch.setVisible(false);
             itemAzar.setVisible(true);
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
@@ -197,6 +216,8 @@ public class ActividadPrincipal extends AppCompatActivity
             fragment = new FragmentBuscarRestaurantes();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+            itemAzar.setVisible(false);
+            itemSearch.setVisible(true);
         } /*else if (id == R.id.nav_share) {
 
         }*/ else if (id == R.id.nav_logout)
@@ -229,275 +250,69 @@ public class ActividadPrincipal extends AppCompatActivity
     }
 
 
-    private class TraerRestaurantes extends AsyncTask<String, Void, ArrayList<Restaurantes>> {
-        private ProgressDialog dialog = new ProgressDialog(ActividadPrincipal.this);
-        private OkHttpClient client = new OkHttpClient();
 
-        @Override
-        protected void onPreExecute() {
-            this.dialog.setMessage("Please wait");
-            this.dialog.show();
-        }
+    public Dialog onCreateDialogSingleChoice() {
 
-        @Override
-        protected void onPostExecute(final ArrayList<Restaurantes> resultadoRestaurantes) {
-            super.onPostExecute(resultadoRestaurantes);
+//Initialize the Alert Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//Source of the data in the DIalog
+        String[] array = {"Nombre", "Calidad", "Precio"};
 
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-            if (!resultadoRestaurantes.isEmpty()) {
+        final List<String> optionsList = Arrays.asList(array);
+// Set the dialog title
+        builder.setTitle("Buscar por...")
+// Specify the list array, the items to be selected by default (null for none),
+// and the listener through which to receive callbacks when items are selected
+                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
 
-                String url;
-                url="http://salidasnow.hol.es/UsuariosRestaurantes/obtener_IdRestaurant_byUsuario.php?idUsuario="+ActividadPrincipal.usuarioActual.get_idUsuario();
-                Log.d(TAG,url);
-
-                MyTaskParams params = new MyTaskParams(url,resultadoRestaurantes);
-               new RestaurantesLikeados().execute(params);
-
-            } else {
-                Toast.makeText(ActividadPrincipal.this, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        protected ArrayList<Restaurantes> doInBackground(String... params) {
-            String url = params[0];
-
-            Log.d("url doInB Precio", url);
-            ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-                arrayRestaurantes = parsearResultado(response.body().string());
-
-                return arrayRestaurantes;
-
-            } catch (IOException | JSONException e) {
-                Log.d("Error1", e.getMessage());                          // Error de Network o al parsear JSON
-                return arrayRestaurantes;
-            }
-        }
-
-
-        ArrayList<Restaurantes> parsearResultado(String JSONstr) throws JSONException {
-            ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
-
-            JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
-            //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
-
-            JSONArray jsonRestaurantes = json.getJSONArray("restaurants");
-
-            int condicion;
-            if (jsonRestaurantes.length() > 10) {
-                condicion = 10;
-            } else {
-                condicion = jsonRestaurantes.length();
-            }
-
-            for (int i = 0; i < condicion; i++) {
-
-                JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
-
-                int jsonId = jsonResultado.getInt("idRestaurant");
-                String jsonNombre = jsonResultado.getString("Nombre");
-                String jsonDireccion = jsonResultado.getString("Direccion");
-                int jsonPrecio = jsonResultado.getInt("Precio");
-                int jsonEstrellas = jsonResultado.getInt("Estrellas");
-                int jsonNumeroTel = jsonResultado.getInt("NumeroTelefono");
-                double jsonLatitud = (double) jsonResultado.getDouble("Latitud");
-                double jsonLongitud = (double) jsonResultado.getDouble("Longitud");
-
-                Log.d("parsearResulRes", "Nombre: " + jsonNombre + " Direccion: " + jsonDireccion);
-                Log.d("latLng","Lat: "+ jsonLatitud+ " Lng: "+jsonLongitud);
-
-                Restaurantes re = new Restaurantes();
-                re.set_Precio(jsonPrecio);
-                re.set_Nombre(jsonNombre);
-                re.set_NumTelefono(jsonNumeroTel);
-                re.set_Latitud(jsonLatitud);
-                re.set_Longitud(jsonLongitud);
-                re.set_Estrellas(jsonEstrellas);
-                re.set_Direccion(jsonDireccion);
-                re.set_IdRestaurant(jsonId);
-
-
-                RestaurantArrayList.add(re);                                                 // Agrego objeto d al array list
-
-            }
-            return RestaurantArrayList;
-        }
-    }
-    private static class MyTaskParams {
-      String url;
-        ArrayList<Restaurantes> listaRestaurantes;
-
-        MyTaskParams(String url, ArrayList<Restaurantes> lista) {
-            this.url = url;
-            this.listaRestaurantes =lista;
-
-        }
-    }
-    private class RestaurantesLikeados extends AsyncTask<MyTaskParams, Void, ArrayList<Restaurantes>>
-    {
-        private OkHttpClient client = new OkHttpClient();
-        @Override
-        protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
-
-
-                setListViewAdapter(listaRestos);
-                setListViewHeader();
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if (position != 0) {
-                            Restaurantes unResto = listaRestos.get(position - 1);
-                            Log.d("Test", "00");
-                            Log.d("Test", listaRestos.get(position - 1) + "");
-                            Intent mapActivity = new Intent(ActividadPrincipal.this, MapsActivity.class);
+                    public void onClick(DialogInterface dialog, int which) {
+// TODO Auto-generated method stub
+                         opcionSeleccionadaBuscarRestaurantes = optionsList.get(which);
 
-                            mapActivity.putExtra("Restaurant", unResto);
-                            startActivity(mapActivity);
+                        Log.d("currentItem",opcionSeleccionadaBuscarRestaurantes);
+                        // Notify the current action
+                        Toast.makeText(getApplicationContext(),
+                                opcionSeleccionadaBuscarRestaurantes, Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+
+// Set the action buttons
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+// User clicked OK, so save the result somewhere
+// or return them to the component that opened the dialog
+                        switch (opcionSeleccionadaBuscarRestaurantes) {
+                            case "Nombre":
+                                txtnombre.setVisibility(View.VISIBLE);
+                                spnprecio.setVisibility(View.INVISIBLE);
+                                spncalidad.setVisibility(View.INVISIBLE);
+
+                                break;
+                            case "Calidad":
+                                spncalidad.setVisibility(View.VISIBLE);
+                                spnprecio.setVisibility(View.INVISIBLE);
+                                txtnombre.setVisibility(View.INVISIBLE);
+                                break;
+                            case "Precio":
+                                spnprecio.setVisibility(View.VISIBLE);
+                                spncalidad.setVisibility(View.INVISIBLE);
+                                txtnombre.setVisibility(View.INVISIBLE);
+                                break;
                         }
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
                     }
                 });
 
-            super.onPostExecute(listaRestos);
-
-        }
-
-        @Override
-        protected ArrayList<Restaurantes> doInBackground(MyTaskParams... params) {
-            String url = params[0].url;
-            ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
-
-            Log.d("url doInB Precio", url);
-
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-                arrayRestaurantes = parsearResultado(response.body().string(),params[0].listaRestaurantes);
-
-
-                return arrayRestaurantes;
-
-            } catch (IOException | JSONException e) {
-                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
-                return arrayRestaurantes;
-            }
-
-        }
-        ArrayList<Restaurantes> parsearResultado(String JSONstr, ArrayList<Restaurantes> listaRestos) throws JSONException {
-            // ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
-            boolean flag=false;
-
-            JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
-            //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
-
-
-            if (json.getInt("estado")==1) {
-                JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
-
-                int condicion;
-                if (jsonRestaurantes.length() > 100) {
-                    condicion = 100;
-                } else {
-                    condicion = jsonRestaurantes.length();
-                }
-
-                for (Restaurantes unResta : listaRestos) {
-
-                    unResta.set_Likeado(false);
-                }
-
-                for (int i = 0; i < condicion; i++) {
-
-                    flag = false;
-                    JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
-
-                    int jsonIdRestaurant = jsonResultado.getInt("idRestaurant");
-                    int PosicionRestaurant = -1;
-
-                    for (Restaurantes unResto : listaRestos) {
-                        if (unResto.get_IdRestaurant() == jsonIdRestaurant) {
-                            PosicionRestaurant=listaRestos.indexOf(unResto);
-                            flag = true;
-                            listaRestos.get(PosicionRestaurant).set_Likeado(true);
-                            listaRestos.set(PosicionRestaurant, listaRestos.get(PosicionRestaurant));
-                        }
-                    }
-                }
-
-
-            }
-            return listaRestos;
-        }
+        return builder.create();
     }
-        private void setListViewHeader() {
-            LayoutInflater inflater = getLayoutInflater();
-            View header = inflater.inflate(R.layout.header_listview, listView, false);
-            totalClassmates = (TextView) header.findViewById(R.id.total);
-            swipeLayout = (SwipeLayout)header.findViewById(R.id.swipe_layout);
-            setSwipeViewFeatures();
-            totalClassmates.setText("Restaurantes");
-            listView.addHeaderView(header);
-        }
-
-        private void setSwipeViewFeatures() {
-            //set show mode.
-            swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
-
-            //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
-            swipeLayout.addDrag(SwipeLayout.DragEdge.Left, findViewById(R.id.bottom_wrapper));
-
-            swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
-                @Override
-                public void onClose(SwipeLayout layout) {
-                    Log.i(TAG, "onClose");
-                }
-
-                @Override
-                public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                    Log.i(TAG, "on swiping");
-                }
-
-                @Override
-                public void onStartOpen(SwipeLayout layout) {
-                    Log.i(TAG, "on start open");
-                }
-
-                @Override
-                public void onOpen(SwipeLayout layout) {
-                    Log.i(TAG, "the BottomView totally show");
-                }
-
-                @Override
-                public void onStartClose(SwipeLayout layout) {
-                    Log.i(TAG, "the BottomView totally close");
-                }
-
-                @Override
-                public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-                    //when user's hand released.
-                }
-            });
-        }
-
-        private void setListViewAdapter(ArrayList<Restaurantes>lista) {
-            adapter = new AdaptadorListViewRestaurantes(ActividadPrincipal.this,R.layout.list_item_restaurant, lista, usuarioActual,2);
-            listView.setAdapter(adapter);
-
-            //totalClassmates.setText("Restaurantes");
-        }
-
-        public void updateAdapter() {
-            adapter.notifyDataSetChanged(); //update adapter
-            totalClassmates.setText(" "); //update total friends in list
-        }
-
 
 }

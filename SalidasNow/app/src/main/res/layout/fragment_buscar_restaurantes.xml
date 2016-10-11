@@ -7,14 +7,14 @@
     tools:context="com.salidasnow.salidasnow.FragmentBuscarRestaurantes">
 
 
-    <Spinner
+  <!--  <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/Spneleccion"
         android:background="@drawable/gradient_spinner"
         android:layout_marginBottom="15px"
         android:foregroundGravity="center">
-    </Spinner>
+    </Spinner>-->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-      <!--  <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />-->
+       <item
+            android:id="@+id/nav_Azar"
+            android:icon="@drawable/ic_shuffle_black_24dp"
+            android:title="Al azar" />
         <item
             android:id="@+id/nav_recomendador"
             android:icon="@drawable/ic_swap_calls_black_24dp"

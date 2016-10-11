@@ -39,8 +39,8 @@ import java.util.ArrayList;
 public class FragmentBuscarRestaurantes extends Fragment {
 
 
-    Spinner spncalidad, spnprecio, spneleccion;
-    EditText txtnombre;
+     public static   Spinner spncalidad, spnprecio, spneleccion;
+    public static EditText txtnombre;
     String nombrebuscado;
     Context thisContext;
     ArrayList<String> arrayspnprecio;
@@ -53,8 +53,9 @@ public class FragmentBuscarRestaurantes extends Fragment {
     ListView listView;
     private TextView totalClassmates;
     private SwipeLayout swipeLayout;
-    AdaptadorListViewRestaurantes adapter;
+ public static    AdaptadorListViewRestaurantes adapter;
     boolean setearLVHeader;
+public static ArrayList<Restaurantes> gListaRestaurantes;
 
     private final static String TAG = FragmentBuscarRestaurantes.class.getSimpleName();
 
@@ -69,6 +70,8 @@ public class FragmentBuscarRestaurantes extends Fragment {
         // Inflate the layout for this fragment
         View vista= inflater.inflate(R.layout.fragment_buscar_restaurantes, container, false);
 
+        gListaRestaurantes=new ArrayList<>();
+
         thisContext=container.getContext();
 
         setearLVHeader=true;
@@ -79,7 +82,7 @@ public class FragmentBuscarRestaurantes extends Fragment {
 
         spncalidad = (Spinner)vista.findViewById(R.id.SpnCalidad);
         spnprecio = (Spinner)vista.findViewById(R.id.SpnPrecio);
-        spneleccion = (Spinner)vista.findViewById(R.id.Spneleccion);
+        //spneleccion = (Spinner)vista.findViewById(R.id.Spneleccion);
         txtnombre = (EditText)vista.findViewById(R.id.nombbuscar);
         //  nombrebuscado = txtnombre.getText().toString().trim();
         arrayspncalidad = new ArrayList<String>();
@@ -109,15 +112,18 @@ public class FragmentBuscarRestaurantes extends Fragment {
         adaptereleccion = new ArrayAdapter<String>(thisContext,  R.layout.spinner_item, arrayspneleccion);
         spncalidad.setAdapter(adaptercalidad);
         spnprecio.setAdapter(adapterprecio);
-        spneleccion.setAdapter(adaptereleccion);
+        //spneleccion.setAdapter(adaptereleccion);
         spnprecio.setVisibility(View.INVISIBLE);
         spncalidad.setVisibility(View.INVISIBLE);
-        txtnombre.setVisibility(View.INVISIBLE);
+        txtnombre.setVisibility(View.VISIBLE);
 
-        spneleccion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+
+
+        /*spneleccion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             /**
              * Called when a new item is selected (in the Spinner)
-             */
+
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
                 // An spinnerItem was selected. You can retrieve the selected item using
@@ -148,7 +154,7 @@ public class FragmentBuscarRestaurantes extends Fragment {
             }
 
         }); // (optional)
-
+        */
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -390,28 +396,33 @@ public class FragmentBuscarRestaurantes extends Fragment {
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
-            setListViewAdapter(listaRestos);
+            gListaRestaurantes.addAll(listaRestos);
+            setListViewAdapter(gListaRestaurantes);
+
+
+            setListViewAdapter(gListaRestaurantes);
             if (setearLVHeader) {
              setearLVHeader=false;
-                setListViewHeader();
+                //setListViewHeader();
             }
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (position!=0)
-                    {
-                        Restaurantes unResto = listaRestos.get(position-1);
+
+                      Restaurantes unResto = gListaRestaurantes.get(position);
                         Log.d("Test", "00");
-                        Log.d("Test", listaRestos.get(position-1) + "");
+                        Log.d("Test", gListaRestaurantes.get(position) + "");
                         Intent mapActivity = new Intent(thisContext, MapsActivity.class);
 
+                    mapActivity.putExtra("PosicionRestaurantLista",position);
+                    mapActivity.putExtra("FragmentLlamador",TAG);
                         mapActivity.putExtra("Restaurant", unResto);
                         startActivity(mapActivity);
-                    }
+
                 }
             });
 
-            super.onPostExecute(listaRestos);
+
 
         }
 
