@@ -191,6 +191,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
            Picasso.with(getApplicationContext())
                     .load("http://salidasnow.hol.es/images/"+ restaurantRecibido.get_IdRestaurant()+".jpg")
                     .fit()
+                    .placeholder(getResources().getDrawable(R.drawable.default_image))
                     .into(imagenrestaurant);
 
             switch (restaurantRecibido.get_Precio())
@@ -234,6 +235,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        final String FLikeados = FragmentRestaurantesLikeados.class.getSimpleName().toString();
+        String FRecomendador = FragmentRecomendador.class.getSimpleName().toString();
+        String FBuscarRestaurantes= FragmentBuscarRestaurantes.class.getSimpleName().toString();
+        String FAlAzar= FragmentRestaurantesAzar.class.getSimpleName().toString();
+        if (FLikeados.equals(FragmentQueLlama))
+        {
+            if (PosicionRestaurantEnLista!=-1) {
+                FragmentRestaurantesLikeados.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                FragmentRestaurantesLikeados.adapter.notifyDataSetChanged();
+            }
+        }
+        else if (FRecomendador.equals(FragmentQueLlama))
+        {
+            if (PosicionRestaurantEnLista!=-1) {
+                FragmentRecomendador.listaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                FragmentRecomendador.adapter.notifyDataSetChanged();
+            }
+        }
+        else if(FBuscarRestaurantes.equals(FragmentQueLlama))
+        {
+            if (PosicionRestaurantEnLista!=-1) {
+                FragmentBuscarRestaurantes.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                FragmentBuscarRestaurantes.adapter.notifyDataSetChanged();
+            }
+        }
+        else if (FAlAzar.equals(FragmentQueLlama))
+        {
+            if (PosicionRestaurantEnLista!=-1) {
+                FragmentRestaurantesAzar.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
+            }
+        }
+
+        finish();
+    }
 
     /**
      * Manipulates the map once available.

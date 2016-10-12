@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.salidasnow.salidasnow.FragmentCercaDeMi"
+    android:orientation="vertical"
+    android:paddingTop="55dp">
+<Switch
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Gps Activado"
+    android:layout_gravity="center"
+    android:textSize="30dp"
+    android:id="@+id/switch_ubicacion"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/latitud"
+        android:text="latitud"
+        android:textSize="30dp"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/longitud"
+        android:text="longitud"
+        android:textSize="30dp"
+        />
+
+
+</LinearLayout>

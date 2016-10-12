@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
+import com.google.android.gms.maps.internal.IGoogleMapDelegate;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -198,7 +199,16 @@ public class ActividadPrincipal extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
             itemSearch.setVisible(false);
             itemAzar.setVisible(false);
-        } else if (id == R.id.nav_recomendador) {
+        }
+        else if (id == R.id.nav_Cerca_de_mi)
+        {
+            fragment = new FragmentCercaDeMi();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+            itemSearch.setVisible(false);
+            itemAzar.setVisible(false);
+        }
+        else if (id == R.id.nav_recomendador) {
            fragment = new FragmentRecomendador();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();

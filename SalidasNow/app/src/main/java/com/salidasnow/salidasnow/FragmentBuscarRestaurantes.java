@@ -548,7 +548,7 @@ public static ArrayList<Restaurantes> gListaRestaurantes;
     private void setListViewAdapter(ArrayList<Restaurantes> lista) {
 
         Log.d("UsuarioEnLikeados", ActividadPrincipal.usuarioActual.get_Nombre());
-        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,2);
+        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,4);
         listView.setAdapter(adapter);
 
         //totalClassmates.setText("Restaurantes");

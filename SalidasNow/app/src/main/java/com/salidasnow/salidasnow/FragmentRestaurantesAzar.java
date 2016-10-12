@@ -185,14 +185,14 @@ public class FragmentRestaurantesAzar extends Fragment {
 
             gListaRestaurantes.addAll(listaRestos);
             setListViewAdapter(gListaRestaurantes);
-            setListViewHeader();
+
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if (position != 0) {
                         Restaurantes unResto = listaRestos.get(position - 1);
                         Log.d("Test", "00");
-                        Log.d("Test", listaRestos.get(position - 1) + "");
+                        Log.d("Test", listaRestos.get(position - 1).get_Nombre() + "");
                         Intent mapActivity = new Intent(thisContext, MapsActivity.class);
 
                         mapActivity.putExtra("PosicionRestaurantLista",position-1);
@@ -202,7 +202,7 @@ public class FragmentRestaurantesAzar extends Fragment {
                     }
                 }
             });
-
+            setListViewHeader();
             super.onPostExecute(listaRestos);
 
         }
@@ -327,7 +327,7 @@ public class FragmentRestaurantesAzar extends Fragment {
     }
 
     private void setListViewAdapter(ArrayList<Restaurantes>lista) {
-        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,2);
+        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,3);
         listView.setAdapter(adapter);
 
         //totalClassmates.setText("Restaurantes");
@@ -335,7 +335,6 @@ public class FragmentRestaurantesAzar extends Fragment {
 
     public void updateAdapter() {
         adapter.notifyDataSetChanged(); //update adapter
-        totalClassmates.setText(" "); //update total friends in list
     }
 
 }

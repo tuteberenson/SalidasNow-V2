@@ -33,7 +33,12 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
     ArrayList<Restaurantes> restaurants;
     Context context;
     Usuarios usuarioActual;
-    Integer DesdeDondeLlamo; // si DeDondeLlamo = 1 estoy llamando desde likeados si es = 2 lo estoy llamando de otro lado
+    Integer DesdeDondeLlamo; // si DeDondeLlamo = 1 estoy llamando desde likeados
+                            // si es = 2 lo estoy llamando Recomendador
+                           //=3 de Azar
+                          //  =4 de Buscar
+
+
 
 
     public AdaptadorListViewRestaurantes(Context context,int resource, ArrayList<Restaurantes> restaurants, Usuarios usuario, Integer desdeDondeLlamo) {
@@ -174,6 +179,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         {
             holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
             holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
+
         }
         else
         {
@@ -212,6 +218,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                             Toast.makeText(context, "Me gusta!", Toast.LENGTH_SHORT).show();
                             holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
                             restaurants.get(position).set_Likeado(true);
+                            holder.swipeLayout.close();
                         }
                         else
                         {
@@ -219,6 +226,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                             Toast.makeText(context, "No me gusta :(", Toast.LENGTH_SHORT).show();
                             holder.unItemLV.setBackgroundColor(Color.rgb(255, 198, 197));
                             restaurants.get(position).set_Likeado(false);
+                            holder.swipeLayout.close();
                         }
                     }
                 }
@@ -279,9 +287,32 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // friends.remove(position);
-               // holder.swipeLayout.close();
-                // activity.updateAdapter();
+
+
+                switch (DesdeDondeLlamo)
+                {
+                    case 2:
+                        restaurants.remove(position);
+                        FragmentRecomendador.adapter.notifyDataSetChanged();
+                        break;
+                    case 3:
+
+                     /*   Log.d("Prueba delete", "En la posicion: " + position + " del lv está el resto: " + holder.nombreTV.getText());
+                        //restaurants.remove(position);
+                        FragmentRestaurantesAzar.gListaRestaurantes.remove(position);
+                        FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
+*/
+                        Log.d("Prueba delete", "Ahora en la posicion: " + position + " del lv está el resto: " + holder.nombreTV.getText());
+
+                        break;
+                    case 4:
+                        restaurants.remove(position);
+                        FragmentBuscarRestaurantes.adapter.notifyDataSetChanged();
+
+                        break;
+                }
+                holder.swipeLayout.close();
+
             }
         };
     }

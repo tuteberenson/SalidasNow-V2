@@ -29,6 +29,11 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!--Para obtener ubicacion-->
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
