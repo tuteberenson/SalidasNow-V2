@@ -5,13 +5,6 @@
     tools:context="com.salidasnow.salidasnow.FragmentCercaDeMi"
     android:orientation="vertical"
     android:paddingTop="55dp">
-<Switch
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Gps Activado"
-    android:layout_gravity="center"
-    android:textSize="30dp"
-    android:id="@+id/switch_ubicacion"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

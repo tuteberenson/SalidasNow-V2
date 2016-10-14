@@ -193,10 +193,10 @@ public class FragmentRestaurantesLikeados extends Fragment {
         private OkHttpClient client = new OkHttpClient();
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
-
+            setListViewHeader();
             gListaRestaurantes.addAll(listaRestos);
             setListViewAdapter(gListaRestaurantes);
-            setListViewHeader();
+
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

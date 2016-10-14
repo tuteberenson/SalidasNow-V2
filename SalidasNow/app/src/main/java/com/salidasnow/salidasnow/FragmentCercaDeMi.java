@@ -11,13 +11,15 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.List;
 
 
 /**
@@ -25,9 +27,10 @@ import android.widget.Toast;
  */
 public class FragmentCercaDeMi extends Fragment implements LocationListener {
 
+    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 1;
+
     TextView latitud;
     TextView longitud;
-    Switch mySwitch;
     Context thisContext;
     public LocationManager handle;
     private String provider;
@@ -45,33 +48,32 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
 
         thisContext = container.getContext();
 
+
+        if (ContextCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSION_ACCESS_COARSE_LOCATION);
+        } else {
+            IniciarServicio();
+
+        }
+
         latitud = (TextView) vista.findViewById(R.id.latitud);
         longitud = (TextView) vista.findViewById(R.id.longitud);
-        mySwitch = (Switch) vista.findViewById(R.id.switch_ubicacion);
 
-
-        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setEstadoSwitch(isChecked);
-            }
-        });
 
         return vista;
     }
 
-    void  setEstadoSwitch(boolean x)
-    {
-        if (x)
-        {
+    void setEstadoServicio(boolean x) {
+        if (x) {
             IniciarServicio();
             muestraPosicionActual();
-        }
-        else
-        {
+        } else {
             pararServicio();
         }
     }
+
     public void IniciarServicio() {
         Toast.makeText(thisContext, "Busqueda de ubicación activada", Toast.LENGTH_SHORT).show();
         handle = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -82,14 +84,24 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
         if (ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        handle.requestLocationUpdates(provider, 10000, 1, this);
+        if (provider =="passive")
+        {
+            Toast.makeText(thisContext, "Activa el gps", Toast.LENGTH_SHORT).show();
+        }
+        else if (provider == null)
+        {
+            Toast.makeText(thisContext, "Permite el acceso a tu ubicación", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            handle.requestLocationUpdates(provider, 10000, 1, this);
+        }
     }
 
     public void muestraPosicionActual() {
         if (ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        Location location = handle.getLastKnownLocation(provider);
+        Location location = getLastKnownLocation();
         if (location == null) {
             latitud.setText("Latitud: desconocida");
             longitud.setText("Longitud: desconocida");
@@ -102,13 +114,6 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
 
     public void pararServicio() {
         if (ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         handle.removeUpdates(this);
@@ -143,5 +148,39 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_ACCESS_COARSE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // All good!
+                    setEstadoServicio(true);
+                } else {
+                    Toast.makeText(thisContext, "Need your location!", Toast.LENGTH_SHORT).show();
+                }
+
+                break;
+        }
+    }
+
+     Location getLastKnownLocation() {
+        List<String> providers = handle.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            if (ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+            }
+            Location l = handle.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
 }

@@ -182,7 +182,7 @@ public class FragmentRestaurantesAzar extends Fragment {
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
-
+            setListViewHeader();
             gListaRestaurantes.addAll(listaRestos);
             setListViewAdapter(gListaRestaurantes);
 
@@ -202,7 +202,7 @@ public class FragmentRestaurantesAzar extends Fragment {
                     }
                 }
             });
-            setListViewHeader();
+
             super.onPostExecute(listaRestos);
 
         }
