@@ -95,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String FRecomendador = FragmentRecomendador.class.getSimpleName().toString();
                 String FBuscarRestaurantes= FragmentBuscarRestaurantes.class.getSimpleName().toString();
                 String FAlAzar= FragmentRestaurantesAzar.class.getSimpleName().toString();
+                String FCercaDeMi = FragmentCercaDeMi.class.getSimpleName().toString();
                 if (FLikeados.equals(FragmentQueLlama))
                 {
                     if (PosicionRestaurantEnLista!=-1) {
@@ -121,6 +122,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (PosicionRestaurantEnLista!=-1) {
                         FragmentRestaurantesAzar.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
                         FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
+                    }
+                }
+                else if (FCercaDeMi.equals(FragmentQueLlama))
+                {
+                    if (PosicionRestaurantEnLista!=-1) {
+                        FragmentCercaDeMi.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                        FragmentCercaDeMi.adapter.notifyDataSetChanged();
                     }
                 }
 
@@ -241,6 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String FRecomendador = FragmentRecomendador.class.getSimpleName().toString();
         String FBuscarRestaurantes= FragmentBuscarRestaurantes.class.getSimpleName().toString();
         String FAlAzar= FragmentRestaurantesAzar.class.getSimpleName().toString();
+        String FCercaDeMi = FragmentCercaDeMi.class.getSimpleName().toString();
         if (FLikeados.equals(FragmentQueLlama))
         {
             if (PosicionRestaurantEnLista!=-1) {
@@ -267,6 +276,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (PosicionRestaurantEnLista!=-1) {
                 FragmentRestaurantesAzar.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
                 FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
+            }
+        }
+        else if (FCercaDeMi.equals(FragmentQueLlama))
+        {
+            if (PosicionRestaurantEnLista!=-1) {
+                FragmentCercaDeMi.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
+                FragmentCercaDeMi.adapter.notifyDataSetChanged();
             }
         }
 
