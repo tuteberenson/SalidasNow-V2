@@ -35,8 +35,9 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
     Usuarios usuarioActual;
     Integer DesdeDondeLlamo; // si DeDondeLlamo = 1 estoy llamando desde likeados
                             // si es = 2 lo estoy llamando Recomendador
-                           //=3 de Azar
-                          //  =4 de Buscar
+                           // = 3 de Azar
+                          // = 4 de Buscar
+                         // = 5 de Cerca de mi
 
 
 
@@ -72,7 +73,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         // If holder not exist then locate all view from UI file.
         if (convertView == null) {
             // inflate UI from XML file
-            if (DesdeDondeLlamo==1)
+            if (DesdeDondeLlamo==1 || DesdeDondeLlamo == 3 || DesdeDondeLlamo == 5)
             {
                 convertView = inflater.inflate(R.layout.list_item_restaurants_likeados, parent, false);
             }
@@ -132,7 +133,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         }
         //handling buttons event
         holder.btnEdit.setOnClickListener(onLikeListener(position, holder));
-        if (DesdeDondeLlamo!=1) {
+        if (DesdeDondeLlamo!=1 && DesdeDondeLlamo != 3 && DesdeDondeLlamo != 5) {
             holder.btnDelete.setOnClickListener(onDeleteListener(position, holder));
         }
         //holder.estrellasTV.setText("Estrellas: " + p.get_Estrellas());
@@ -295,16 +296,16 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                         restaurants.remove(position);
                         FragmentRecomendador.adapter.notifyDataSetChanged();
                         break;
-                    case 3:
+                  /*  case 3:
 
                      /*   Log.d("Prueba delete", "En la posicion: " + position + " del lv está el resto: " + holder.nombreTV.getText());
                         //restaurants.remove(position);
                         FragmentRestaurantesAzar.gListaRestaurantes.remove(position);
                         FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
-*/
+
                         Log.d("Prueba delete", "Ahora en la posicion: " + position + " del lv está el resto: " + holder.nombreTV.getText());
 
-                        break;
+                        break;*/
                     case 4:
                         restaurants.remove(position);
                         FragmentBuscarRestaurantes.adapter.notifyDataSetChanged();
@@ -329,7 +330,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         public ViewHolder(View v) {
             nombreTV = (TextView) v.findViewById(R.id.nombre);
             swipeLayout = (SwipeLayout)v.findViewById(R.id.swipe_layout);
-            if (DesdeDondeLlamo!=1) {
+            if (DesdeDondeLlamo!=1 && DesdeDondeLlamo != 3 && DesdeDondeLlamo != 5) {
                 btnDelete = v.findViewById(R.id.delete);
             }
             btnEdit = v.findViewById(R.id.icon_likeLV);

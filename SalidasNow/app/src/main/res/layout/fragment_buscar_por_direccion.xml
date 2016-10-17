@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="57dp"
+    tools:context="com.salidasnow.salidasnow.FragmentBuscarPorDireccion">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/edtx_buscar_por_direccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Dirección"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textSize="15dp"
+            android:layout_centerVertical="true"
+            android:ellipsize="start"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            />
+    </android.support.design.widget.TextInputLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/buttonshape"
+        android:text="Buscar"
+        android:id="@+id/btn_buscar_por_direccion"
+        android:textSize="20dp"/>
+<ListView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="10dp"
+    android:id="@+id/Lv_buscar_por_direccion">
+
+</ListView>
+</LinearLayout>

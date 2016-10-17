@@ -11,23 +11,28 @@
         android:id="@+id/latitud"
         android:text="latitud"
         android:textSize="30dp"
-        />
+        />-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/longitud"
-        android:text="longitud"
-        android:textSize="30dp"
-        />-->
+        android:id="@+id/tv_direccion_cerca_de_mi"
+        android:text="Dirección: desconocida"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:paddingBottom="5dp"/>
 <Button
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Actualizar"
+    android:layout_gravity="center"
+    android:textColor="#FFFFFF"
+    android:background="@drawable/buttonshape"
+    android:text="Buscar"
     android:id="@+id/btn_actualizar"
-    android:textSize="30dp"/>
+    android:textSize="20dp"/>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="10dp"
         android:id="@+id/list_view_cerca_de_mi"></ListView>
 
 </LinearLayout>

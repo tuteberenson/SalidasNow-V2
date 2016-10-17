@@ -542,7 +542,7 @@ public class FragmentRecomendador extends Fragment {
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
-
+            listaRestos.clear();
             listaRestaurantes.addAll(listaRestos);
 
             setListViewAdapter(listaRestaurantes);
@@ -640,7 +640,7 @@ public class FragmentRecomendador extends Fragment {
     public Dialog onCreateDialogSingleChoiceCalidad() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"Baja", "Media", "Alta"};
 
@@ -687,7 +687,7 @@ public class FragmentRecomendador extends Fragment {
     public Dialog onCreateDialogSingleChoicePrecio() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"Bajo", "Medio", "Alto"};
 
@@ -734,7 +734,7 @@ public class FragmentRecomendador extends Fragment {
     public Dialog onCreateDialogSingleChoiceAmbientacion() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"Baja", "Media", "Alta"};
 

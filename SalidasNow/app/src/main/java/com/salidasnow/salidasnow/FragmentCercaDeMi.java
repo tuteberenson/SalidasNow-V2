@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
+import com.squareup.okhttp.Address;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -53,6 +56,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     Button btn_Actualizar;
     TextView latitud;
     TextView longitud;
+    TextView tv_Direccion;
     Context thisContext;
     public LocationManager handle;
     private String provider;
@@ -62,8 +66,11 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     public static AdaptadorListViewRestaurantes adapter;
     private TextView totalClassmates;
     private SwipeLayout swipeLayout;
-    private final static String TAG = FragmentRestaurantesAzar.class.getSimpleName();
+    private final static String TAG = FragmentCercaDeMi.class.getSimpleName();
     public static ArrayList<Restaurantes> gListaRestaurantes;
+    boolean setearLVHeader;
+    public static Location ubicacionActual;
+    String direccionActual;
 
     public FragmentCercaDeMi() {
         // Required empty public constructor
@@ -79,6 +86,10 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
         thisContext = container.getContext();
 
         listView=(ListView)vista.findViewById(R.id.list_view_cerca_de_mi);
+
+        setearLVHeader=true;
+
+        tv_Direccion = (TextView)vista.findViewById(R.id.tv_direccion_cerca_de_mi);
 
         gListaRestaurantes=new ArrayList<>();
 
@@ -99,6 +110,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
         btn_Actualizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Dialog dialog = onCreateDialogSingleChoice();
                 dialog.show();
             }
@@ -116,12 +128,12 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     }
 
     public void IniciarServicio() {
-        Toast.makeText(thisContext, "Busqueda de ubicación activada", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(thisContext, "Busqueda de ubicación activada", Toast.LENGTH_SHORT).show();
         handle = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         provider = handle.getBestProvider(c, true);
-        Toast.makeText(thisContext, "Proveedor: " + provider, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(thisContext, "Proveedor: " + provider, Toast.LENGTH_SHORT).show();
         if (ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -134,7 +146,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
             Toast.makeText(thisContext, "Permite el acceso a tu ubicación", Toast.LENGTH_SHORT).show();
         }
         else {
-            handle.requestLocationUpdates(provider, 10000, 1, this);
+            handle.requestLocationUpdates(provider, 1200000, 1, this);
         }
     }
 
@@ -148,11 +160,38 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
            // longitud.setText("Longitud: desconocida");
             Toast.makeText(thisContext, "No se pudo obtener la ubicacion", Toast.LENGTH_SHORT).show();
         } else {
+            ubicacionActual=location;
             String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byCercania.php?latitud="+location.getLatitude()+"&longitud="+location.getLongitude()+"&distancia="+LimiteDeCuadras;
           Log.d(TAG,url);
             new TraerRestaurantes().execute(url);
         }
 
+        setDireccion(location);
+
+    }
+
+    private void setDireccion(Location loc)
+    {
+        if (loc!=null)
+        {
+            if (loc.getLongitude()!=0.0 && loc.getLatitude()!=0.0)
+            {
+                try {
+                    Geocoder geocoder = new Geocoder(thisContext, Locale.getDefault());
+                    List<android.location.Address> list=geocoder.getFromLocation(loc.getLatitude(),loc.getLongitude(),1);
+                    if (!list.isEmpty())
+                    {
+                        android.location.Address direc=list.get(0);
+                        tv_Direccion.setText("Dirección aproximada: "+direc.getAddressLine(0));
+                        direccionActual = direc.getAddressLine(0);
+                    }
+                }
+                catch (IOException e)
+                {
+                    tv_Direccion.setText(e+"");
+                }
+            }
+        }
     }
 
     public void pararServicio() {
@@ -176,8 +215,8 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
         } else {
            // latitud.setText("Latitud: " + String.valueOf(location.getLatitude()));
            // longitud.setText("Longitud: " + String.valueOf(location.getLongitude()));
-            String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byCercania.php?latitud="+location.getLatitude()+"&longitud="+location.getLongitude()+"&distancia="+LimiteDeCuadras;
-            new TraerRestaurantes().execute(url);
+           // String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byCercania.php?latitud="+location.getLatitude()+"&longitud="+location.getLongitude()+"&distancia="+LimiteDeCuadras;
+           // new TraerRestaurantes().execute(url);
 
         }
     }
@@ -205,7 +244,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
                     // All good!
                     setEstadoServicio(true);
                 } else {
-                    Toast.makeText(thisContext, "Need your location!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(thisContext, "Para utilizar esta función se necesita su ubicación!", Toast.LENGTH_SHORT).show();
                 }
 
                 break;
@@ -233,7 +272,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     public Dialog onCreateDialogSingleChoice() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"3", "5", "7","10"};
 
@@ -252,8 +291,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
 
                         Log.d("currentItem", LimiteDeCuadrasOPC);
                         // Notify the current action
-                        Toast.makeText(thisContext,
-                                LimiteDeCuadrasOPC, Toast.LENGTH_SHORT).show();
+                      //Toast.makeText(thisContext,LimiteDeCuadrasOPC, Toast.LENGTH_SHORT).show();
 
                     }
                 })
@@ -264,6 +302,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
                     public void onClick(DialogInterface dialog, int id) {
 // User clicked OK, so save the result somewhere
 // or return them to the component that opened the dialog
+
                         switch (LimiteDeCuadrasOPC) {
                             case "3":
                                 LimiteDeCuadras=0.3;
@@ -280,7 +319,12 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
                         }
                       //  if (provider.equals("gps"))
                       //  {
+
+
+
+                           listView.setAdapter(null);
                             PosicionActual();
+
                        // }
                      //   else
                        // {
@@ -327,7 +371,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
                 new RestaurantesLikeados().execute(params);
 
             } else {
-                Toast.makeText(thisContext, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
+                Toast.makeText(thisContext, "No se encontraron restaurantes cerca", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -418,8 +462,15 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
-            setListViewHeader();
+
+            if (setearLVHeader) {
+                setearLVHeader=false;
+                setListViewHeader();
+            }
+
             Log.d("sizeLista2",listaRestos.size()+"");
+
+            gListaRestaurantes.clear();
                 gListaRestaurantes.addAll(listaRestos);
 
             setListViewAdapter(gListaRestaurantes);
@@ -450,7 +501,8 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
                         Toast.makeText(thisContext, "El restaurant está entre 7 y 10 cuadras de su ubicación", Toast.LENGTH_SHORT).show();
                     }
 
-
+                        mapActivity.putExtra("direcActual",direccionActual);
+                        mapActivity.putExtra("Location",ubicacionActual);
                         mapActivity.putExtra("PosicionRestaurantLista",position-1);
                         mapActivity.putExtra("FragmentLlamador",TAG);
                         mapActivity.putExtra("Restaurant", unResto);
@@ -582,7 +634,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     }
 
     private void setListViewAdapter(ArrayList<Restaurantes>lista) {
-        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,3);
+        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,5);
         listView.setAdapter(adapter);
 
         //totalClassmates.setText("Restaurantes");

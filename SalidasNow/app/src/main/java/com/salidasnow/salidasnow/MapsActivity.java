@@ -1,6 +1,9 @@
 package com.salidasnow.salidasnow;
 
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
+import android.graphics.drawable.LevelListDrawable;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.internal.IGoogleMapDelegate;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.okhttp.OkHttpClient;
@@ -30,6 +34,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import static com.salidasnow.salidasnow.FragmentBuscarPorDireccion.adapter;
+import static com.salidasnow.salidasnow.FragmentBuscarPorDireccion.coordenadasDireccionObtenida;
+import static com.salidasnow.salidasnow.FragmentBuscarPorDireccion.direcBuscada;
+import static com.salidasnow.salidasnow.FragmentBuscarPorDireccion.gListaRestaurantes;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -41,6 +50,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageButton btnVolver, btnLike;
     String FragmentQueLlama;
     int PosicionRestaurantEnLista;
+    Location ubicacionActual;
+    String direccionActual;
 
     TextView Calidad1,Calidad2,Calidad3,Calidad4,Calidad5;
 
@@ -53,6 +64,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         FragmentQueLlama= getIntent().getStringExtra("FragmentLlamador");
         PosicionRestaurantEnLista = getIntent().getIntExtra("PosicionRestaurantLista",-1);
+
+
+            if (getIntent().hasExtra("Location") && getIntent().hasExtra("direcActual"))
+            {
+                ubicacionActual = getIntent().getParcelableExtra("Location");
+                direccionActual=getIntent().getStringExtra("direcActual");
+            }
+        else
+            {
+                ubicacionActual=null;
+            }
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -91,53 +113,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String FLikeados = FragmentRestaurantesLikeados.class.getSimpleName().toString();
-                String FRecomendador = FragmentRecomendador.class.getSimpleName().toString();
-                String FBuscarRestaurantes= FragmentBuscarRestaurantes.class.getSimpleName().toString();
-                String FAlAzar= FragmentRestaurantesAzar.class.getSimpleName().toString();
-                String FCercaDeMi = FragmentCercaDeMi.class.getSimpleName().toString();
-                if (FLikeados.equals(FragmentQueLlama))
-                {
-                    if (PosicionRestaurantEnLista!=-1) {
-                        FragmentRestaurantesLikeados.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
-                        FragmentRestaurantesLikeados.adapter.notifyDataSetChanged();
-                    }
-                }
-                else if (FRecomendador.equals(FragmentQueLlama))
-                {
-                    if (PosicionRestaurantEnLista!=-1) {
-                        FragmentRecomendador.listaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
-                        FragmentRecomendador.adapter.notifyDataSetChanged();
-                    }
-                }
-                else if(FBuscarRestaurantes.equals(FragmentQueLlama))
-                {
-                    if (PosicionRestaurantEnLista!=-1) {
-                        FragmentBuscarRestaurantes.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
-                        FragmentBuscarRestaurantes.adapter.notifyDataSetChanged();
-                    }
-                }
-                else if (FAlAzar.equals(FragmentQueLlama))
-                {
-                    if (PosicionRestaurantEnLista!=-1) {
-                        FragmentRestaurantesAzar.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
-                        FragmentRestaurantesAzar.adapter.notifyDataSetChanged();
-                    }
-                }
-                else if (FCercaDeMi.equals(FragmentQueLlama))
-                {
-                    if (PosicionRestaurantEnLista!=-1) {
-                        FragmentCercaDeMi.gListaRestaurantes.set(PosicionRestaurantEnLista,restaurantRecibido);
-                        FragmentCercaDeMi.adapter.notifyDataSetChanged();
-                    }
-                }
-
+            updateListasAdapters();
               finish();
             }
         });
 
 
         if (restaurantRecibido!=null) {
+
 
         if (restaurantRecibido.is_Likeado())
         {
@@ -245,11 +228,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
+       updateListasAdapters();
+        finish();
+    }
+
+    public void updateListasAdapters()
+    {
         final String FLikeados = FragmentRestaurantesLikeados.class.getSimpleName().toString();
         String FRecomendador = FragmentRecomendador.class.getSimpleName().toString();
         String FBuscarRestaurantes= FragmentBuscarRestaurantes.class.getSimpleName().toString();
         String FAlAzar= FragmentRestaurantesAzar.class.getSimpleName().toString();
         String FCercaDeMi = FragmentCercaDeMi.class.getSimpleName().toString();
+        String FBuscarXdirec = FragmentBuscarPorDireccion.class.getSimpleName();
         if (FLikeados.equals(FragmentQueLlama))
         {
             if (PosicionRestaurantEnLista!=-1) {
@@ -285,10 +275,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 FragmentCercaDeMi.adapter.notifyDataSetChanged();
             }
         }
+        else if (FBuscarXdirec.equals(FragmentQueLlama)) {
+            if (PosicionRestaurantEnLista != -1) {
+                gListaRestaurantes.set(PosicionRestaurantEnLista, restaurantRecibido);
+                adapter.notifyDataSetChanged();
+            }
+        }
 
-        finish();
+
     }
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -307,24 +302,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (mMap!=null)
         {
-            addMark(restaurantRecibido.get_Latitud(), restaurantRecibido.get_Longitud(), restaurantRecibido.get_Nombre());
+            addMark(restaurantRecibido.get_Latitud(), restaurantRecibido.get_Longitud(), restaurantRecibido.get_Nombre(),false);
+
+            if(coordenadasDireccionObtenida!=null)
+            {
+                addMark(coordenadasDireccionObtenida.latitude,coordenadasDireccionObtenida.longitude,"Dirección buscada",true);
+            }
+            if (ubicacionActual!=null)
+            {
+                addMark(ubicacionActual.getLatitude(),ubicacionActual.getLongitude(),"Ubicación actual",true);
+            }
+
         }
     }
 
 
-   public void addMark(double lat, double lng, String titulo)
+   public void addMark(double lat, double lng, String titulo, boolean usuario)
     {
-        CameraUpdate posRestaurant= CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lng),15);
-       // CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
+        if (!usuario) {
+            CameraUpdate posRestaurant = CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 15);
+            // CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
 
-        mMap.moveCamera(posRestaurant);
-        //mMap.animateCamera(zoom);
+            mMap.moveCamera(posRestaurant);
+            //mMap.animateCamera(zoom);
 
 
-        MarkerOptions mo = new MarkerOptions()
-                .position(new LatLng(lat,lng))
-                .title(titulo);
-        mMap.addMarker(mo);
+            MarkerOptions mo = new MarkerOptions()
+                    .position(new LatLng(lat, lng))
+                    .snippet(restaurantRecibido.get_Direccion())
+                    .title(titulo);
+            mMap.addMarker(mo);
+        }
+        else
+        {
+            if (coordenadasDireccionObtenida!=null) {
+                direcBuscada = direcBuscada.substring(0, direcBuscada.indexOf(","));
+                MarkerOptions mo = new MarkerOptions()
+                        .position(new LatLng(lat, lng))
+                        .title(titulo)
+                        .snippet(direcBuscada)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.usermarker));
+                mMap.addMarker(mo);
+            }
+            else
+            {
+                MarkerOptions mo = new MarkerOptions()
+                        .position(new LatLng(lat, lng))
+                        .title(titulo)
+                        .snippet(direccionActual)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.usermarker));
+                mMap.addMarker(mo);
+            }
+            }
     }
     private class insertLikeAsync extends AsyncTask<String, Void,String>
     {
@@ -372,6 +401,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         btnLike.setBackgroundColor(Color.rgb(196, 198, 197));
                         restaurantRecibido.set_Likeado(false);
                     }
+                    updateListasAdapters();
                 }
             }
             catch (JSONException e)

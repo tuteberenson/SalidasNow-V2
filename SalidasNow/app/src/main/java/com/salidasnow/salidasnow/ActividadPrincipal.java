@@ -50,6 +50,7 @@ import java.util.List;
 import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.spncalidad;
 import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.spnprecio;
 import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.txtnombre;
+import static com.salidasnow.salidasnow.FragmentCercaDeMi.ubicacionActual;
 
 public class ActividadPrincipal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -59,9 +60,11 @@ public class ActividadPrincipal extends AppCompatActivity
    public static Usuarios usuarioActual;
 
     private boolean isStartup;
-    MenuItem itemAzar, itemSearch;
+    MenuItem itemAzar, itemSearch, itemMap, itemChange;
     private ArrayList<Integer> mSelectedItems;
     String opcionSeleccionadaBuscarRestaurantes;
+
+    String FragmentActual;
 
     private final static String TAG = ActividadPrincipal.class.getSimpleName();
 
@@ -150,6 +153,8 @@ public class ActividadPrincipal extends AppCompatActivity
         getMenuInflater().inflate(R.menu.actividad_principal, menu);
         itemAzar= menu.findItem(R.id.action_random);
         itemSearch=menu.findItem(R.id.action_select_search);
+        itemMap=menu.findItem(R.id.action_show_in_map);
+        itemChange=menu.findItem(R.id.action_change);
         return true;
     }
 
@@ -172,6 +177,56 @@ public class ActividadPrincipal extends AppCompatActivity
         {
             Dialog dialog = onCreateDialogSingleChoice();
             dialog.show();
+        }
+        else if (id == R.id.action_show_in_map)
+        {
+            if (!FragmentCercaDeMi.gListaRestaurantes.isEmpty() && ubicacionActual!=null)
+            {
+                Intent mapActivityResto = new Intent(this, MapsActivityRestaurants.class);
+                mapActivityResto.putExtra("Restaurantes",FragmentCercaDeMi.gListaRestaurantes);
+                mapActivityResto.putExtra("Location",ubicacionActual);
+                startActivity(mapActivityResto);
+            }
+            else
+            {
+                if (FragmentCercaDeMi.gListaRestaurantes.isEmpty())
+                {
+                    Toast.makeText(this, "Busque restaurantes", Toast.LENGTH_SHORT).show();
+                }
+                else if (ubicacionActual== null)
+                {
+                    Toast.makeText(this, "No se halló su ubicación", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        else if (id == R.id.action_change)
+        {
+            Fragment fragment = null;
+            if (FragmentActual.equals(FragmentCercaDeMi.class.getSimpleName()))
+            {
+
+                FragmentActual= FragmentBuscarPorDireccion.class.getSimpleName();
+                fragment = new FragmentBuscarPorDireccion();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+                itemMap.setVisible(false);
+                itemSearch.setVisible(false);
+                itemAzar.setVisible(false);
+                itemChange.setVisible(true);
+
+            }
+            else if (FragmentActual.equals(FragmentBuscarPorDireccion.class.getSimpleName()))
+            {
+                FragmentActual=FragmentCercaDeMi.class.getSimpleName();
+                fragment = new FragmentCercaDeMi();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+                itemSearch.setVisible(false);
+                itemAzar.setVisible(false);
+                itemMap.setVisible(true);
+                itemChange.setVisible(true);
+
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -197,8 +252,10 @@ public class ActividadPrincipal extends AppCompatActivity
             fragment = new FragmentRestaurantesAzar();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+            itemMap.setVisible(false);
             itemSearch.setVisible(false);
             itemAzar.setVisible(false);
+            itemChange.setVisible(false);
         }
         else if (id == R.id.nav_Cerca_de_mi)
         {
@@ -207,17 +264,24 @@ public class ActividadPrincipal extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
             itemSearch.setVisible(false);
             itemAzar.setVisible(false);
+            itemMap.setVisible(true);
+            itemChange.setVisible(true);
+            FragmentActual=FragmentCercaDeMi.class.getSimpleName();
         }
         else if (id == R.id.nav_recomendador) {
            fragment = new FragmentRecomendador();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
+            itemMap.setVisible(false);
             itemSearch.setVisible(false);
             itemAzar.setVisible(false);
+            itemChange.setVisible(false);
         } else if (id == R.id.nav_likeados) {
            // fragmentClass = FragmentRestaurantesLikeados.class;
             fragment = new FragmentRestaurantesLikeados();
+            itemMap.setVisible(false);
             itemSearch.setVisible(false);
+            itemChange.setVisible(false);
             itemAzar.setVisible(true);
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
@@ -228,6 +292,8 @@ public class ActividadPrincipal extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
             itemAzar.setVisible(false);
             itemSearch.setVisible(true);
+            itemMap.setVisible(false);
+            itemChange.setVisible(false);
         } /*else if (id == R.id.nav_share) {
 
         }*/ else if (id == R.id.nav_logout)
@@ -264,7 +330,7 @@ public class ActividadPrincipal extends AppCompatActivity
     public Dialog onCreateDialogSingleChoice() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"Nombre", "Calidad", "Precio"};
 

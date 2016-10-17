@@ -53,9 +53,9 @@ public class FragmentBuscarRestaurantes extends Fragment {
     ListView listView;
     private TextView totalClassmates;
     private SwipeLayout swipeLayout;
- public static    AdaptadorListViewRestaurantes adapter;
+     public static    AdaptadorListViewRestaurantes adapter;
     boolean setearLVHeader;
-public static ArrayList<Restaurantes> gListaRestaurantes;
+    public static ArrayList<Restaurantes> gListaRestaurantes;
 
     private final static String TAG = FragmentBuscarRestaurantes.class.getSimpleName();
 
@@ -396,11 +396,12 @@ public static ArrayList<Restaurantes> gListaRestaurantes;
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
+            gListaRestaurantes.clear();
             gListaRestaurantes.addAll(listaRestos);
             setListViewAdapter(gListaRestaurantes);
 
 
-            setListViewAdapter(gListaRestaurantes);
+            //setListViewAdapter(gListaRestaurantes);
             if (setearLVHeader) {
              setearLVHeader=false;
                 //setListViewHeader();
