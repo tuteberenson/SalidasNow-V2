@@ -117,7 +117,7 @@ public class FragmentBuscarPorDireccion extends Fragment {
 
     private class GeolocalizacionTask extends AsyncTask<String, Void, ArrayList<Direcciones>> {
         private OkHttpClient client = new OkHttpClient();
-        private ProgressDialog dialog = new ProgressDialog(getContext());
+        private ProgressDialog dialog = new ProgressDialog(thisContext);
 
         @Override
         protected void onPreExecute() {
