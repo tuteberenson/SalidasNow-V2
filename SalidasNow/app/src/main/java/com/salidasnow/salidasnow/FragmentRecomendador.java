@@ -45,14 +45,14 @@ public class FragmentRecomendador extends Fragment {
     private TextView totalClassmates;
     private SwipeLayout swipeLayout;
     Context thisContext;
-    CheckBox checkBox1,checkBox2,checkBox3;
+    CheckBox checkBox1, checkBox2, checkBox3;
     Button btnMasOpciones, btnRecomendame;
-    ArrayList<Indicadores> gArrayIndicadores,indicadoresAlAzar;
+    ArrayList<Indicadores> gArrayIndicadores, indicadoresAlAzar;
     ListView listView;
     public static AdaptadorListViewRestaurantes adapter;
     boolean setearLVHeader;
-    String seleccionCalidad,seleccionPrecio,seleccionAmbientacion;
-   public static ArrayList<Restaurantes> listaRestaurantes;
+    String seleccionCalidad, seleccionPrecio, seleccionAmbientacion;
+    public static ArrayList<Restaurantes> listaRestaurantes;
 
     private final static String TAG = FragmentRecomendador.class.getSimpleName();
 
@@ -67,16 +67,16 @@ public class FragmentRecomendador extends Fragment {
         // Inflate the layout for this fragment
         View vista = inflater.inflate(R.layout.fragment_recomendador, container, false);
 
-        listaRestaurantes=new ArrayList<>();
-        setearLVHeader=true;
+        listaRestaurantes = new ArrayList<>();
+        setearLVHeader = true;
 
-        thisContext=container.getContext();
+        thisContext = container.getContext();
 
-        checkBox1 = (CheckBox) vista.findViewById(R.id.chbox1);
-        checkBox2 = (CheckBox) vista.findViewById(R.id.chbox2);
-        checkBox3 = (CheckBox) vista.findViewById(R.id.chbox3);
+      //  checkBox1 = (CheckBox) vista.findViewById(R.id.chbox1);
+      //  checkBox2 = (CheckBox) vista.findViewById(R.id.chbox2);
+       // checkBox3 = (CheckBox) vista.findViewById(R.id.chbox3);
 
-        btnMasOpciones = (Button) vista.findViewById(R.id.btnMasOpc);
+      //  btnMasOpciones = (Button) vista.findViewById(R.id.btnMasOpc);
         btnRecomendame = (Button) vista.findViewById(R.id.btnRecomendame);
 
         listView = (ListView) vista.findViewById(R.id.listVwRecomendador);
@@ -88,21 +88,19 @@ public class FragmentRecomendador extends Fragment {
         Log.d("url solicitada", url);
 
 
+        //new AsyncTaskIndicadores().execute(url);
 
-        new AsyncTaskIndicadores().execute(url);
 
-
-      btnMasOpciones.setOnClickListener(new View.OnClickListener()
-        {
+       /* btnMasOpciones.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 OrdenarRdm();
 
-                checkBox1.setChecked(false);
-                checkBox2.setChecked(false);
-                checkBox3.setChecked(false);
+               // checkBox1.setChecked(false);
+              //  checkBox2.setChecked(false);
+              //  checkBox3.setChecked(false);
             }
-        });
+        });*/
 
         btnRecomendame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,13 +189,10 @@ public class FragmentRecomendador extends Fragment {
         });
 
 
-
-
         return vista;
     }
 
-    private class AsyncTaskIndicadores extends AsyncTask<String, Void,ArrayList<Indicadores>>
-    {
+   /* private class AsyncTaskIndicadores extends AsyncTask<String, Void, ArrayList<Indicadores>> {
         private ProgressDialog dialog = new ProgressDialog(thisContext);
         private OkHttpClient client = new OkHttpClient();
 
@@ -205,7 +200,7 @@ public class FragmentRecomendador extends Fragment {
         protected ArrayList<Indicadores> doInBackground(String... params) {
             String url = params[0];
 
-            ArrayList<Indicadores> arrayIndicadores=new ArrayList<>();
+            ArrayList<Indicadores> arrayIndicadores = new ArrayList<>();
 
             Request request = new Request.Builder()
                     .url(url)
@@ -216,15 +211,14 @@ public class FragmentRecomendador extends Fragment {
 
                 String strResponseBody = response.body().string();
 
-                Log.d("response body",strResponseBody);
+                Log.d("response body", strResponseBody);
 
 
                 arrayIndicadores = parsearResultadoIndicadores(strResponseBody);
 
 
                 return arrayIndicadores;
-            }catch (IOException | JSONException e)
-            {
+            } catch (IOException | JSONException e) {
                 Log.d("Error", e.getMessage());
                 return arrayIndicadores;
             }
@@ -232,26 +226,25 @@ public class FragmentRecomendador extends Fragment {
 
         private ArrayList<Indicadores> parsearResultadoIndicadores(String JSONstr) throws JSONException {
 
-            ArrayList<Indicadores> listaIndicadores=new ArrayList<>();
+            ArrayList<Indicadores> listaIndicadores = new ArrayList<>();
 
             JSONObject json = new JSONObject(JSONstr);
 
-            JSONArray jsonIndicadores= json.getJSONArray("indicadores");
+            JSONArray jsonIndicadores = json.getJSONArray("indicadores");
 
-            if (jsonIndicadores.length()==0)
-            {
+            if (jsonIndicadores.length() == 0) {
                 Toast.makeText(thisContext, "aaa", Toast.LENGTH_LONG).show();
             }
 
-            for (int i=0; i<jsonIndicadores.length();i++) {
+            for (int i = 0; i < jsonIndicadores.length(); i++) {
 
-                JSONObject jsonResultado= jsonIndicadores.getJSONObject(i);
+                JSONObject jsonResultado = jsonIndicadores.getJSONObject(i);
 
-                String jsonTextoIndicador =jsonResultado.getString("Texto");
-                String jsonCategoriaIndicador= jsonResultado.getString("Categoria");
-                int jsonValorIndicador= jsonResultado.getInt("Valor");
+                String jsonTextoIndicador = jsonResultado.getString("Texto");
+                String jsonCategoriaIndicador = jsonResultado.getString("Categoria");
+                int jsonValorIndicador = jsonResultado.getInt("Valor");
 
-                Indicadores unIndicador= new Indicadores();
+                Indicadores unIndicador = new Indicadores();
 
                 unIndicador.setTexto(jsonTextoIndicador);
                 unIndicador.setCategoria(jsonCategoriaIndicador);
@@ -260,7 +253,6 @@ public class FragmentRecomendador extends Fragment {
                 listaIndicadores.add(unIndicador);
 
             }
-
 
 
             return listaIndicadores;
@@ -280,33 +272,30 @@ public class FragmentRecomendador extends Fragment {
                 dialog.dismiss();
             }
 
-            if (!resultadoIndicadores.isEmpty())
-            {
+            if (!resultadoIndicadores.isEmpty()) {
                 gArrayIndicadores.addAll(resultadoIndicadores);
-                Log.d("IndicadorArray",gArrayIndicadores.get(0).getTexto());
+                Log.d("IndicadorArray", gArrayIndicadores.get(0).getTexto());
                 OrdenarRdm();
-            }
-            else
-            {
+            } else {
                 Toast.makeText(thisContext, "No se pudieron obtener los indicadores", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-    public void OrdenarRdm()
-    {
+    }*/
+
+    public void OrdenarRdm() {
 
 
         Random generadorAzar = new Random();
 
-        String texto1="", texto2="", texto3="", cat1,cat2,cat3;
-        int comparadoresT12,comparadoresT13,comparadoresT23, comparadoresC12,comparadoresC13, comparadoresC23;
+        String texto1 = "", texto2 = "", texto3 = "", cat1, cat2, cat3;
+        int comparadoresT12, comparadoresT13, comparadoresT23, comparadoresC12, comparadoresC13, comparadoresC23;
         indicadoresAlAzar = new ArrayList<>();
 
         int numeroElegido;
 
-        ArrayList<Integer> listaNumerosAzar=new ArrayList<>();
+        ArrayList<Integer> listaNumerosAzar = new ArrayList<>();
 
-        boolean volverAGenerar= true;
+        boolean volverAGenerar = true;
 
         while (volverAGenerar) {
 
@@ -329,39 +318,35 @@ public class FragmentRecomendador extends Fragment {
             }
 
 
+            texto1 = indicadoresAlAzar.get(0).getTexto();
+            texto2 = indicadoresAlAzar.get(1).getTexto();
+            texto3 = indicadoresAlAzar.get(2).getTexto();
 
-            texto1= indicadoresAlAzar.get(0).getTexto();
-            texto2= indicadoresAlAzar.get(1).getTexto();
-            texto3= indicadoresAlAzar.get(2).getTexto();
+            cat1 = indicadoresAlAzar.get(0).getCategoria();
+            cat2 = indicadoresAlAzar.get(1).getCategoria();
+            cat3 = indicadoresAlAzar.get(2).getCategoria();
 
-            cat1= indicadoresAlAzar.get(0).getCategoria();
-            cat2= indicadoresAlAzar.get(1).getCategoria();
-            cat3= indicadoresAlAzar.get(2).getCategoria();
+            comparadoresT12 = texto1.compareTo(texto2);
+            comparadoresT13 = texto1.compareTo(texto3);
+            comparadoresT23 = texto2.compareTo(texto3);
 
-            comparadoresT12=texto1.compareTo(texto2);
-            comparadoresT13=texto1.compareTo(texto3);
-            comparadoresT23=texto2.compareTo(texto3);
+            comparadoresC12 = cat1.compareTo(cat2);
+            comparadoresC13 = cat1.compareTo(cat3);
+            comparadoresC23 = cat2.compareTo(cat3);
 
-            comparadoresC12=cat1.compareTo(cat2);
-            comparadoresC13=cat1.compareTo(cat3);
-            comparadoresC23=cat2.compareTo(cat3);
-
-            if (comparadoresC12 != 0 && comparadoresC13 !=0 && comparadoresC23!= 0 &&
-                    comparadoresT12!=0 && comparadoresT13!=0 && comparadoresT23!=0)
-            {
-                volverAGenerar=false;
-            }
-            else
-            {
+            if (comparadoresC12 != 0 && comparadoresC13 != 0 && comparadoresC23 != 0 &&
+                    comparadoresT12 != 0 && comparadoresT13 != 0 && comparadoresT23 != 0) {
+                volverAGenerar = false;
+            } else {
                 listaNumerosAzar.clear();
                 indicadoresAlAzar.clear();
             }
 
 
         }
-        checkBox1.setText(texto1);
-        checkBox2.setText(texto2);
-        checkBox3.setText(texto3);
+//        checkBox1.setText(texto1);
+  //      checkBox2.setText(texto2);
+    //    checkBox3.setText(texto3);
     }
 
     private class TraerRestaurantsPorParametro extends AsyncTask<String, Void, ArrayList<Restaurantes>> {
@@ -385,7 +370,6 @@ public class FragmentRecomendador extends Fragment {
 
                 if (!resultadoRestaurants.isEmpty()) {
 
-
                     String url;
                     url = "http://salidasnow.hol.es/UsuariosRestaurantes/obtener_IdRestaurant_byUsuario.php?idUsuario=" + ActividadPrincipal.usuarioActual.get_idUsuario();
                     Log.d(TAG, url);
@@ -398,84 +382,85 @@ public class FragmentRecomendador extends Fragment {
                 }
             }
         }
-            @Override
-            protected ArrayList<Restaurantes> doInBackground (String...params){
-                String url = params[0];
 
-                Log.d("url doInB Precio", url);
-                ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    arrayRestaurantes = parsearResultadoRestosPrecio(response.body().string());
+        @Override
+        protected ArrayList<Restaurantes> doInBackground(String... params) {
+            String url = params[0];
 
-                    return arrayRestaurantes;
+            Log.d("url doInB Precio", url);
+            ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                arrayRestaurantes = parsearResultadoRestosPrecio(response.body().string());
 
-                } catch (IOException | JSONException e) {
-                    Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
-                    return arrayRestaurantes;
-                }
-            }
+                return arrayRestaurantes;
 
-
-            ArrayList<Restaurantes> parsearResultadoRestosPrecio (String JSONstr)throws
-            JSONException {
-                ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
-
-                JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
-                //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
-
-                JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
-
-                int condicion;
-                if (jsonRestaurantes.length() > 10) {
-                    condicion = 10;
-                } else {
-                    condicion = jsonRestaurantes.length();
-                }
-
-                for (int i = 0; i < condicion; i++) {
-
-                    JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
-
-                    int jsonId = jsonResultado.getInt("idRestaurant");
-                    String jsonNombre = jsonResultado.getString("Nombre");
-                    String jsonDireccion = jsonResultado.getString("Direccion");
-                    int jsonPrecio = jsonResultado.getInt("Precio");
-                    int jsonEstrellas = jsonResultado.getInt("Estrellas");
-                    int jsonNumeroTel = jsonResultado.getInt("NumeroTelefono");
-                    double jsonLatitud = (double) jsonResultado.getDouble("Latitud");
-                    double jsonLongitud = (double) jsonResultado.getDouble("Longitud");
-
-                    Log.d("parsearResulRes", "Nombre: " + jsonNombre + " Direccion: " + jsonDireccion);
-                    Log.d("latLng", "Lat: " + jsonLatitud + " Lng: " + jsonLongitud);
-
-                    Restaurantes re = new Restaurantes();
-                    re.set_Precio(jsonPrecio);
-                    re.set_Nombre(jsonNombre);
-                    re.set_NumTelefono(jsonNumeroTel);
-                    re.set_Latitud(jsonLatitud);
-                    re.set_Longitud(jsonLongitud);
-                    re.set_Estrellas(jsonEstrellas);
-                    re.set_Direccion(jsonDireccion);
-                    re.set_IdRestaurant(jsonId);
-
-
-                    RestaurantArrayList.add(re);
-
-                }
-                return RestaurantArrayList;
+            } catch (IOException | JSONException e) {
+                Log.d("Error", e.getMessage());                          // Error de Network o al parsear JSON
+                return arrayRestaurantes;
             }
         }
+
+
+        ArrayList<Restaurantes> parsearResultadoRestosPrecio(String JSONstr) throws
+                JSONException {
+            ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
+
+            JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
+            //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
+
+            JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
+
+            int condicion;
+            if (jsonRestaurantes.length() > 10) {
+                condicion = 10;
+            } else {
+                condicion = jsonRestaurantes.length();
+            }
+
+            for (int i = 0; i < condicion; i++) {
+
+                JSONObject jsonResultado = jsonRestaurantes.getJSONObject(i);
+
+                int jsonId = jsonResultado.getInt("idRestaurant");
+                String jsonNombre = jsonResultado.getString("Nombre");
+                String jsonDireccion = jsonResultado.getString("Direccion");
+                int jsonPrecio = jsonResultado.getInt("Precio");
+                int jsonEstrellas = jsonResultado.getInt("Estrellas");
+                int jsonNumeroTel = jsonResultado.getInt("NumeroTelefono");
+                double jsonLatitud = (double) jsonResultado.getDouble("Latitud");
+                double jsonLongitud = (double) jsonResultado.getDouble("Longitud");
+
+                Log.d("parsearResulRes", "Nombre: " + jsonNombre + " Direccion: " + jsonDireccion);
+                Log.d("latLng", "Lat: " + jsonLatitud + " Lng: " + jsonLongitud);
+
+                Restaurantes re = new Restaurantes();
+                re.set_Precio(jsonPrecio);
+                re.set_Nombre(jsonNombre);
+                re.set_NumTelefono(jsonNumeroTel);
+                re.set_Latitud(jsonLatitud);
+                re.set_Longitud(jsonLongitud);
+                re.set_Estrellas(jsonEstrellas);
+                re.set_Direccion(jsonDireccion);
+                re.set_IdRestaurant(jsonId);
+
+
+                RestaurantArrayList.add(re);
+
+            }
+            return RestaurantArrayList;
+        }
+    }
 
 
     private void setListViewHeader() {
         LayoutInflater inflater = LayoutInflater.from(thisContext);
         View header = inflater.inflate(R.layout.header_listview, listView, false);
         totalClassmates = (TextView) header.findViewById(R.id.total);
-        swipeLayout = (SwipeLayout)header.findViewById(R.id.swipe_layout);
+        swipeLayout = (SwipeLayout) header.findViewById(R.id.swipe_layout);
         setSwipeViewFeatures(header);
         totalClassmates.setText("Restaurantes");
         listView.addHeaderView(header);
@@ -486,7 +471,7 @@ public class FragmentRecomendador extends Fragment {
         swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
 
         //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
-        swipeLayout.addDrag(SwipeLayout.DragEdge.Left,header.findViewById(R.id.bottom_wrapper));
+        swipeLayout.addDrag(SwipeLayout.DragEdge.Left, header.findViewById(R.id.bottom_wrapper));
 
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
             @Override
@@ -521,25 +506,27 @@ public class FragmentRecomendador extends Fragment {
         });
     }
 
-    private void setListViewAdapter(ArrayList<Restaurantes>lista) {
-        adapter = new AdaptadorListViewRestaurantes(thisContext,R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual,2);
+    private void setListViewAdapter(ArrayList<Restaurantes> lista) {
+        adapter = new AdaptadorListViewRestaurantes(thisContext, R.layout.list_item_restaurant, lista, ActividadPrincipal.usuarioActual, 2);
         listView.setAdapter(adapter);
 
         //totalClassmates.setText("Restaurantes");
     }
+
     private static class MyTaskParams {
         String url;
         ArrayList<Restaurantes> listaRestaurantes;
 
         MyTaskParams(String url, ArrayList<Restaurantes> lista) {
             this.url = url;
-            this.listaRestaurantes =lista;
+            this.listaRestaurantes = lista;
 
         }
     }
-    private class RestaurantesLikeados extends AsyncTask<MyTaskParams, Void, ArrayList<Restaurantes>>
-    {
+
+    private class RestaurantesLikeados extends AsyncTask<MyTaskParams, Void, ArrayList<Restaurantes>> {
         private OkHttpClient client = new OkHttpClient();
+
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
@@ -552,15 +539,15 @@ public class FragmentRecomendador extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                        Restaurantes unResto = listaRestaurantes.get(position);
-                        Log.d("Test", "00");
-                        Log.d("Test", listaRestaurantes.get(position) + "");
-                        Intent mapActivity = new Intent(thisContext, MapsActivity.class);
+                    Restaurantes unResto = listaRestaurantes.get(position);
+                    Log.d("Test", "00");
+                    Log.d("Test", listaRestaurantes.get(position) + "");
+                    Intent mapActivity = new Intent(thisContext, MapsActivity.class);
 
-                        mapActivity.putExtra("PosicionRestaurantLista",position);
-                        mapActivity.putExtra("FragmentLlamador",TAG);
-                        mapActivity.putExtra("Restaurant", unResto);
-                        startActivity(mapActivity);
+                    mapActivity.putExtra("PosicionRestaurantLista", position);
+                    mapActivity.putExtra("FragmentLlamador", TAG);
+                    mapActivity.putExtra("Restaurant", unResto);
+                    startActivity(mapActivity);
 
                 }
             });
@@ -581,7 +568,7 @@ public class FragmentRecomendador extends Fragment {
                     .build();
             try {
                 Response response = client.newCall(request).execute();
-                arrayRestaurantes = parsearResultado(response.body().string(),params[0].listaRestaurantes);
+                arrayRestaurantes = parsearResultado(response.body().string(), params[0].listaRestaurantes);
 
 
                 return arrayRestaurantes;
@@ -592,15 +579,16 @@ public class FragmentRecomendador extends Fragment {
             }
 
         }
+
         ArrayList<Restaurantes> parsearResultado(String JSONstr, ArrayList<Restaurantes> listaRestos) throws JSONException {
             // ArrayList<Restaurantes> RestaurantArrayList = new ArrayList<>();
-            boolean flag=false;
+            boolean flag = false;
 
             JSONObject json = new JSONObject(JSONstr);                 // Convierto el String recibido a JSONObject
             //JSONObject jsonPrecio = new JSONObject("usuario");  // Array - una busqueda puede retornar varios resultados
 
 
-            if (json.getInt("estado")==1) {
+            if (json.getInt("estado") == 1) {
                 JSONArray jsonRestaurantes = json.getJSONArray("restaurantes");
 
                 int condicion;
@@ -625,7 +613,7 @@ public class FragmentRecomendador extends Fragment {
 
                     for (Restaurantes unResto : listaRestos) {
                         if (unResto.get_IdRestaurant() == jsonIdRestaurant) {
-                            PosicionRestaurant=listaRestos.indexOf(unResto);
+                            PosicionRestaurant = listaRestos.indexOf(unResto);
                             flag = true;
                             listaRestos.get(PosicionRestaurant).set_Likeado(true);
                             listaRestos.set(PosicionRestaurant, listaRestos.get(PosicionRestaurant));
@@ -638,14 +626,15 @@ public class FragmentRecomendador extends Fragment {
             return listaRestos;
         }
     }
+
     public Dialog onCreateDialogSingleChoiceCalidad() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext, R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"Baja", "Media", "Alta"};
 
-        seleccionCalidad="Baja";
+        seleccionCalidad = "Baja";
 
         final List<String> optionsList = Arrays.asList(array);
 // Set the dialog title
@@ -659,7 +648,7 @@ public class FragmentRecomendador extends Fragment {
 // TODO Auto-generated method stub
                         seleccionCalidad = optionsList.get(which);
 
-                        Log.d("currentItem",seleccionCalidad);
+                        Log.d("currentItem", seleccionCalidad);
                         // Notify the current action
                         Toast.makeText(thisContext,
                                 seleccionCalidad, Toast.LENGTH_SHORT).show();
@@ -687,14 +676,15 @@ public class FragmentRecomendador extends Fragment {
 
         return builder.create();
     }
+
     public Dialog onCreateDialogSingleChoicePrecio() {
 
 //Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext, R.style.MyAlertDialogStyle);
 //Source of the data in the DIalog
         String[] array = {"Bajo", "Medio", "Alto"};
 
-        seleccionPrecio="Bajo";
+        seleccionPrecio = "Bajo";
         final List<String> optionsList = Arrays.asList(array);
 // Set the dialog title
         builder.setTitle("Precio: ")
@@ -707,7 +697,7 @@ public class FragmentRecomendador extends Fragment {
 // TODO Auto-generated method stub
                         seleccionPrecio = optionsList.get(which);
 
-                        Log.d("currentItem",seleccionPrecio);
+                        Log.d("currentItem", seleccionPrecio);
                         // Notify the current action
                         Toast.makeText(thisContext,
                                 seleccionPrecio, Toast.LENGTH_SHORT).show();
@@ -721,19 +711,60 @@ public class FragmentRecomendador extends Fragment {
                     public void onClick(DialogInterface dialog, int id) {
 // User clicked OK, so save the result somewhere
 // or return them to the component that opened the dialog
+                        evaluarResultados();
 
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        
+                    public void onClick(DialogInterface dialog, int id) {
+
                     }
                 });
 
         return builder.create();
     }
 
-
+    public void evaluarResultados()
+    {
+        String url="";
+        if (seleccionCalidad == "Baja" && seleccionPrecio == "Bajo")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=menor&condicionE=menor";
+        }
+        else if (seleccionCalidad == "Baja" && seleccionPrecio == "Medio")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=igual&condicionE=menor";
+        }
+        else if(seleccionCalidad == "Baja" && seleccionPrecio == "Alto")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=mayor&condicionE=menor";
+        }
+        else if (seleccionCalidad == "Media" && seleccionPrecio == "Bajo")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=menor&condicionE=igual";
+        }
+        else if (seleccionCalidad == "Media" && seleccionPrecio == "Medio")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=igual&condicionE=igual";
+        }
+        else if (seleccionCalidad == "Media" && seleccionPrecio == "Alto")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=mayor&condicionE=igual";
+        }
+        else if (seleccionCalidad == "Alta" && seleccionPrecio == "Bajo")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=menor&condicionE=mayor";
+        }
+        else if (seleccionCalidad == "Alta" && seleccionPrecio == "Medio")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=igual&condicionE=mayor";
+        }
+        else if (seleccionCalidad == "Alta" && seleccionPrecio == "Alto")
+        {
+            url="http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byParametros.php?valorP=3&valorE=3&condicionP=mayor&condicionE=mayor";
+        }
+        Log.d(TAG,url);
+        new TraerRestaurantsPorParametro().execute(url);
+    }
 }
