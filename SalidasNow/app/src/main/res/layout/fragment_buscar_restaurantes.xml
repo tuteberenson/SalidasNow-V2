@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingTop="55dp"
     tools:context="com.salidasnow.salidasnow.FragmentBuscarRestaurantes">
@@ -21,7 +22,8 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/textInput">
         <EditText
             android:id="@+id/nombbuscar"
             android:layout_width="match_parent"
@@ -33,31 +35,47 @@
             android:layout_centerVertical="true"
             android:ellipsize="start"
             android:gravity="center"
-
             />
         </android.support.design.widget.TextInputLayout>
-        <Spinner
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/SpnPrecio"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            app:ms_enableErrorLabel="false"
+            app:ms_enableFloatingLabel="false" />
+
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/SpnCalidad"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            app:ms_enableErrorLabel="false"
+            app:ms_enableFloatingLabel="false" />
+ <!--       <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/SpnPrecio"
             android:background="@drawable/gradient_spinner"
             android:layout_marginBottom="15px">
-        </Spinner>
+        </Spinner>-->
 
-        <Spinner
+   <!--     <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/SpnCalidad"
             android:background="@drawable/gradient_spinner"
             android:layout_marginBottom="15px">
-        </Spinner>
+        </Spinner>-->
 
 
     </RelativeLayout>
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/buttonshape"
         android:textSize="20dp"
+        android:layout_marginBottom="10dp"
         android:text="Buscar"
         android:id="@+id/btnBuscarRestaurantes"/>
     <ListView

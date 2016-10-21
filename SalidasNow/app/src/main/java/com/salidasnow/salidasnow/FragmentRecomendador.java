@@ -108,7 +108,7 @@ public class FragmentRecomendador extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (!checkBox1.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked())
+              /*  if (!checkBox1.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked())
                 {
                     Toast.makeText(thisContext, "Seleccione al menos una opción", Toast.LENGTH_SHORT).show();
                 }
@@ -184,8 +184,9 @@ public class FragmentRecomendador extends Fragment {
                         Log.d("btnRecomendame","url a ejecutar: "+ urlAEjecutar1);
                         new TraerRestaurantsPorParametro().execute(urlAEjecutar1);
                     }
-                }
-
+                }*/
+                Dialog dialog = onCreateDialogSingleChoiceCalidad();
+                dialog.show();
             }
         });
 
@@ -644,12 +645,14 @@ public class FragmentRecomendador extends Fragment {
 //Source of the data in the DIalog
         String[] array = {"Baja", "Media", "Alta"};
 
+        seleccionCalidad="Baja";
+
         final List<String> optionsList = Arrays.asList(array);
 // Set the dialog title
-        builder.setTitle("Buscar por...")
+        builder.setTitle("Calidad: ")
 // Specify the list array, the items to be selected by default (null for none),
 // and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(array, 0, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -691,12 +694,13 @@ public class FragmentRecomendador extends Fragment {
 //Source of the data in the DIalog
         String[] array = {"Bajo", "Medio", "Alto"};
 
+        seleccionPrecio="Bajo";
         final List<String> optionsList = Arrays.asList(array);
 // Set the dialog title
-        builder.setTitle("Buscar por...")
+        builder.setTitle("Precio: ")
 // Specify the list array, the items to be selected by default (null for none),
 // and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(array, 0, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -717,61 +721,14 @@ public class FragmentRecomendador extends Fragment {
                     public void onClick(DialogInterface dialog, int id) {
 // User clicked OK, so save the result somewhere
 // or return them to the component that opened the dialog
-                        Dialog dialogo = onCreateDialogSingleChoiceAmbientacion();
-                        dialogo.show();
 
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-
-        return builder.create();
-    }
-    public Dialog onCreateDialogSingleChoiceAmbientacion() {
-
-//Initialize the Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(thisContext,R.style.MyAlertDialogStyle);
-//Source of the data in the DIalog
-        String[] array = {"Baja", "Media", "Alta"};
-
-        final List<String> optionsList = Arrays.asList(array);
-// Set the dialog title
-        builder.setTitle("Buscar por...")
-// Specify the list array, the items to be selected by default (null for none),
-// and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-// TODO Auto-generated method stub
-                        seleccionAmbientacion = optionsList.get(which);
-
-                        Log.d("currentItem",seleccionAmbientacion);
-                        // Notify the current action
-                        Toast.makeText(thisContext,
-                                seleccionAmbientacion, Toast.LENGTH_SHORT).show();
-
-                    }
-                })
-
-// Set the action buttons
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-// User clicked OK, so save the result somewhere
-// or return them to the component that opened the dialog
-
-
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        
                     }
                 });
 

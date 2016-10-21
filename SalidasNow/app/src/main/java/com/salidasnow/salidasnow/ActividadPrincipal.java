@@ -49,6 +49,7 @@ import java.util.List;
 
 import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.spncalidad;
 import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.spnprecio;
+import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.textInput;
 import static com.salidasnow.salidasnow.FragmentBuscarRestaurantes.txtnombre;
 import static com.salidasnow.salidasnow.FragmentCercaDeMi.ubicacionActual;
 
@@ -334,17 +335,19 @@ public class ActividadPrincipal extends AppCompatActivity
 //Source of the data in the DIalog
         String[] array = {"Nombre", "Calidad", "Precio"};
 
+        opcionSeleccionadaBuscarRestaurantes="Nombre";
         final List<String> optionsList = Arrays.asList(array);
 // Set the dialog title
         builder.setTitle("Buscar por...")
 // Specify the list array, the items to be selected by default (null for none),
 // and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(array, 1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(array, 0, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 // TODO Auto-generated method stub
                          opcionSeleccionadaBuscarRestaurantes = optionsList.get(which);
+
 
                         Log.d("currentItem",opcionSeleccionadaBuscarRestaurantes);
                         // Notify the current action
@@ -363,6 +366,7 @@ public class ActividadPrincipal extends AppCompatActivity
                         switch (opcionSeleccionadaBuscarRestaurantes) {
                             case "Nombre":
                                 txtnombre.setVisibility(View.VISIBLE);
+                                textInput.setVisibility(View.VISIBLE);
                                 spnprecio.setVisibility(View.INVISIBLE);
                                 spncalidad.setVisibility(View.INVISIBLE);
 
@@ -371,11 +375,13 @@ public class ActividadPrincipal extends AppCompatActivity
                                 spncalidad.setVisibility(View.VISIBLE);
                                 spnprecio.setVisibility(View.INVISIBLE);
                                 txtnombre.setVisibility(View.INVISIBLE);
+                                textInput.setVisibility(View.INVISIBLE);
                                 break;
                             case "Precio":
                                 spnprecio.setVisibility(View.VISIBLE);
                                 spncalidad.setVisibility(View.INVISIBLE);
                                 txtnombre.setVisibility(View.INVISIBLE);
+                                textInput.setVisibility(View.INVISIBLE  );
                                 break;
                         }
 

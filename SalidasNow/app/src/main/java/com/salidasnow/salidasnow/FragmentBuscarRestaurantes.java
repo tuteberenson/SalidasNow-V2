@@ -31,6 +31,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import fr.ganfra.materialspinner.MaterialSpinner;
 
 
 /**
@@ -39,7 +43,9 @@ import java.util.ArrayList;
 public class FragmentBuscarRestaurantes extends Fragment {
 
 
-     public static   Spinner spncalidad, spnprecio, spneleccion;
+     public static  MaterialSpinner spncalidad, spnprecio;
+             Spinner spneleccion;
+ public static    View textInput;
     public static EditText txtnombre;
     String nombrebuscado;
     Context thisContext;
@@ -80,8 +86,10 @@ public class FragmentBuscarRestaurantes extends Fragment {
 
         listView=(ListView)vista.findViewById(R.id.listVwBuscoRestaurantes);
 
-        spncalidad = (Spinner)vista.findViewById(R.id.SpnCalidad);
-        spnprecio = (Spinner)vista.findViewById(R.id.SpnPrecio);
+        textInput=vista.findViewById(R.id.textInput);
+
+        spncalidad = (MaterialSpinner)vista.findViewById(R.id.SpnCalidad);
+        spnprecio = (MaterialSpinner)vista.findViewById(R.id.SpnPrecio);
         //spneleccion = (Spinner)vista.findViewById(R.id.Spneleccion);
         txtnombre = (EditText)vista.findViewById(R.id.nombbuscar);
         //  nombrebuscado = txtnombre.getText().toString().trim();
@@ -101,21 +109,46 @@ public class FragmentBuscarRestaurantes extends Fragment {
         arrayspncalidad.add("4 Estrellas");
         arrayspncalidad.add("5 Estrellas");
 
-        arrayspneleccion.add("Buscar por nombre");
+        /*arrayspneleccion.add("Buscar por nombre");
         arrayspneleccion.add("Buscar por calidad");
-        arrayspneleccion.add("Buscar por precio");
+        arrayspneleccion.add("Buscar por precio");*/
 
 
+        String[] array = new String[arrayspncalidad.size()];
+        int index = 0;
+        for (String value : arrayspncalidad) {
+            array[index] = value;
+            index++;
+        }
 
-        adaptercalidad = new ArrayAdapter<String>(thisContext, R.layout.spinner_item, arrayspncalidad);
-        adapterprecio = new ArrayAdapter<String>(thisContext,  R.layout.spinner_item, arrayspnprecio);
-        adaptereleccion = new ArrayAdapter<String>(thisContext,  R.layout.spinner_item, arrayspneleccion);
-        spncalidad.setAdapter(adaptercalidad);
+        //final List<String> optionsListCalidad = Arrays.asList(array);
+
+        String[] array2 = new String[arrayspnprecio.size()];
+        int index2 = 0;
+        for (String value : arrayspnprecio) {
+            array2[index2] = value;
+            index2++;
+        }
+
+        //final List<String> optionsListPrecio = Arrays.asList(array2);
+
+        adaptercalidad = new ArrayAdapter<String>(thisContext, R.layout.support_simple_spinner_dropdown_item, array);
+        adapterprecio = new ArrayAdapter<String>(thisContext,  R.layout.support_simple_spinner_dropdown_item, array2);
+      //  adaptereleccion = new ArrayAdapter<String>(thisContext,  R.layout.spinner_item, arrayspneleccion);
+
+
+        adaptercalidad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterprecio.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         spnprecio.setAdapter(adapterprecio);
+        spncalidad.setAdapter(adaptercalidad);
+
+
         //spneleccion.setAdapter(adaptereleccion);
         spnprecio.setVisibility(View.INVISIBLE);
         spncalidad.setVisibility(View.INVISIBLE);
         txtnombre.setVisibility(View.VISIBLE);
+        textInput.setVisibility(View.VISIBLE);
 
 
 
@@ -155,6 +188,7 @@ public class FragmentBuscarRestaurantes extends Fragment {
 
         }); // (optional)
         */
+
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,20 +200,19 @@ public class FragmentBuscarRestaurantes extends Fragment {
                 NombreRestaurant= txtnombre.getText().toString().trim();
 
 
-
                 String textoABuscar="";
-                 for (int i=0; i < NombreRestaurant.length(); i++)
-                 {
-                     if (i==0) {
-                         String primeraLetra = NombreRestaurant.substring(0, 1);
-                         textoABuscar+=primeraLetra.toUpperCase();
-                     }
-                     else
-                     {
-                         textoABuscar+= NombreRestaurant.substring(i, i+1);
-                     }
+                for (int i=0; i < NombreRestaurant.length(); i++)
+                {
+                    if (i==0) {
+                        String primeraLetra = NombreRestaurant.substring(0, 1);
+                        textoABuscar+=primeraLetra.toUpperCase();
+                    }
+                    else
+                    {
+                        textoABuscar+= NombreRestaurant.substring(i, i+1);
+                    }
 
-                 }
+                }
 
                 listView.setAdapter(null);
 
