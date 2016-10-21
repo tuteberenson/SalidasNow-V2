@@ -71,7 +71,8 @@
         <activity android:name=".SignUpActivity" />
         <activity
             android:name=".MapsActivityRestaurants"
-            android:label="@string/title_activity_maps_restaurants"></activity>
+            android:label="@string/title_activity_maps_restaurants" />
+        <activity android:name=".QuienesSomos"></activity>
     </application>
 
 </manifest>
