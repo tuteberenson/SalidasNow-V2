@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 public class QuienesSomos extends AppCompatActivity {
 
-    TextView texto;
+    TextView texto,texto2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,9 +15,11 @@ public class QuienesSomos extends AppCompatActivity {
         setContentView(R.layout.activity_quienes_somos);
 
         texto = (TextView) findViewById(R.id.txtnosotros);
+        texto2 = (TextView) findViewById(R.id.txtnosotros2);
         texto.setText("\n" +
-                "Salidas Now es una aplicación móvil, ayudas a las personas a decidir donde pueden ir a comer. Ya esta disponible en el Store de Google Play.\n" +
-                "Con esta simple aplicación vas poder conseguir infinidad restaurants cerca de ti con solo un click.\n" +
-                "La aplicación fue creada en el año 2016, Matias Berenson, Axel Brant, Ilan Pustilnikoff y Ariel Pisterman, por un grupo de estudiantes de la Secundaria ORT Yatay.\n");
+                " Salidas Now es una aplicación móvil, ayudas a las personas a decidir donde pueden ir a comer. Ya esta disponible en el Store de Google Play.\n" +
+                " Con esta simple aplicación vas poder conseguir infinidad restaurants cerca de ti con solo un click.");
+
+        texto2.setText(" La aplicación fue creada en el año 2016, por Matias Berenson, Axel Brant, Ilan Pustilnikoff y Ariel Pisterman, un grupo de estudiantes de la Secundaria ORT Yatay.\n");;
     }
 }

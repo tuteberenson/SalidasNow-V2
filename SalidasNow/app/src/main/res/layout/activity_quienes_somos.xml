@@ -34,10 +34,27 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
-            android:text=""
+            android:text="holaholaholaholaholaholaholaholaholaholaholaholaholahola"
             android:id="@+id/txtnosotros"
-            />
+            android:textSize="15dp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="2dp"
+            android:fontFamily="sans-serif-light"
 
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:text="holaholaholaholaholaholaholaholaholaholaholaholaholahola"
+            android:id="@+id/txtnosotros2"
+            android:textSize="15dp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="2dp"
+            android:fontFamily="sans-serif-thin"
+
+            />
 
 
 
