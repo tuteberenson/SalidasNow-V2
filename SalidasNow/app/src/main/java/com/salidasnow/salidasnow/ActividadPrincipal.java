@@ -268,7 +268,7 @@ public class ActividadPrincipal extends AppCompatActivity
             itemMap.setVisible(false);
             itemSearch.setVisible(false);
             itemChange.setVisible(false);
-            itemAzar.setVisible(true);
+            itemAzar.setVisible(false);
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragment).commit();
 

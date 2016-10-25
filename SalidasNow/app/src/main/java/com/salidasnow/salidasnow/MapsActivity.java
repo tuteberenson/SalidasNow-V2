@@ -134,6 +134,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     int idUsuarioActual=ActividadPrincipal.usuarioActual.get_idUsuario();
                     int idRestaurant=restaurantRecibido.get_IdRestaurant();
+
+                    if (btnLike.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_star_border_black_24dp).getConstantState())
+                    {
+                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                        Toast.makeText(MapsActivity.this, "Me gusta!", Toast.LENGTH_SHORT).show();
+                        btnLike.setBackgroundColor(Color.rgb(164,0,0));
+                    }
+                    else
+                    {
+                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
+                        Toast.makeText(MapsActivity.this, "No me gusta :(", Toast.LENGTH_SHORT).show();
+                        btnLike.setBackgroundColor(Color.rgb(196, 198, 197));
+                    }
+
                     String url = "http://salidasnow.hol.es/UsuariosRestaurantes/setLike.php?idUsuario="+idUsuarioActual+"&idRestaurant="+idRestaurant+"&like=1";
                     new insertLikeAsync().execute(url);
                 }
@@ -389,19 +403,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 {
                     if (btnLike.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_star_border_black_24dp).getConstantState())
                     {
-                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                        Toast.makeText(MapsActivity.this, "Me gusta!", Toast.LENGTH_SHORT).show();
-                        restaurantRecibido.set_Likeado(true);
-                        btnLike.setBackgroundColor(Color.rgb(164,0,0));
+                        restaurantRecibido.set_Likeado(false);
                     }
                     else
                     {
-                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
-                        Toast.makeText(MapsActivity.this, "No me gusta :(", Toast.LENGTH_SHORT).show();
-                        btnLike.setBackgroundColor(Color.rgb(196, 198, 197));
-                        restaurantRecibido.set_Likeado(false);
+                        restaurantRecibido.set_Likeado(true);
                     }
                     updateListasAdapters();
+                }
+                else {
+                    if (btnLike.getDrawable().getConstantState() != getResources().getDrawable(R.drawable.ic_star_border_black_24dp).getConstantState()) {
+                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+
+                        btnLike.setBackgroundColor(Color.rgb(164, 0, 0));
+                    } else {
+                        btnLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_border_black_24dp));
+
+                        btnLike.setBackgroundColor(Color.rgb(196, 198, 197));
+                    }
+                    Toast.makeText(MapsActivity.this, "Ocurrió un error", Toast.LENGTH_SHORT).show();
                 }
             }
             catch (JSONException e)

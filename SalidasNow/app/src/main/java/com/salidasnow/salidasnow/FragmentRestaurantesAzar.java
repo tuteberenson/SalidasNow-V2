@@ -296,6 +296,8 @@ public class FragmentRestaurantesAzar extends Fragment {
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
             @Override
             public void onClose(SwipeLayout layout) {
+
+                updateAdapter();
                 Log.i(TAG, "onClose");
             }
 

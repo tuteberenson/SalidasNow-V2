@@ -366,22 +366,21 @@ public class FragmentRecomendador extends Fragment {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+
             if (!resultadoRestaurants.isEmpty()) {
 
-                if (!resultadoRestaurants.isEmpty()) {
+                String url;
+                url = "http://salidasnow.hol.es/UsuariosRestaurantes/obtener_IdRestaurant_byUsuario.php?idUsuario=" + ActividadPrincipal.usuarioActual.get_idUsuario();
+                Log.d(TAG, url);
 
-                    String url;
-                    url = "http://salidasnow.hol.es/UsuariosRestaurantes/obtener_IdRestaurant_byUsuario.php?idUsuario=" + ActividadPrincipal.usuarioActual.get_idUsuario();
-                    Log.d(TAG, url);
+                MyTaskParams params = new MyTaskParams(url, resultadoRestaurants);
+                new RestaurantesLikeados().execute(params);
 
-                    MyTaskParams params = new MyTaskParams(url, resultadoRestaurants);
-                    new RestaurantesLikeados().execute(params);
-
-                } else {
-                    Toast.makeText(thisContext, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
-                }
+            } else {
+                Toast.makeText(thisContext, "No hay restaurantes con ese criterio", Toast.LENGTH_SHORT).show();
             }
         }
+
 
         @Override
         protected ArrayList<Restaurantes> doInBackground(String... params) {
@@ -530,9 +529,11 @@ public class FragmentRecomendador extends Fragment {
         @Override
         protected void onPostExecute(final ArrayList<Restaurantes> listaRestos) {
 
-            listaRestos.clear();
+            listaRestaurantes.clear();
+            Log.d(TAG, "size listaRestaurantes1: "+listaRestaurantes.size());
             listaRestaurantes.addAll(listaRestos);
-
+            Log.d(TAG, "size listaRestaurantes2: "+listaRestaurantes.size());
+            Log.d(TAG, "size listaRestos: "+listaRestos.size());
             setListViewAdapter(listaRestaurantes);
             //setListViewHeader();
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -561,7 +562,7 @@ public class FragmentRecomendador extends Fragment {
             String url = params[0].url;
             ArrayList<Restaurantes> arrayRestaurantes = new ArrayList<>();
 
-            Log.d("url doInB Precio", url);
+            Log.d("urlLikeados", url);
 
             Request request = new Request.Builder()
                     .url(url)
@@ -570,7 +571,7 @@ public class FragmentRecomendador extends Fragment {
                 Response response = client.newCall(request).execute();
                 arrayRestaurantes = parsearResultado(response.body().string(), params[0].listaRestaurantes);
 
-
+                Log.d(TAG,"Cantidad de posiciones array de restaurantes: "+ arrayRestaurantes.size());
                 return arrayRestaurantes;
 
             } catch (IOException | JSONException e) {
