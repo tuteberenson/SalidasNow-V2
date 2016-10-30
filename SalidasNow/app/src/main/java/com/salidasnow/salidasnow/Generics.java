@@ -2,6 +2,8 @@ package com.salidasnow.salidasnow;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.widget.Toast;
 
 /**
@@ -30,5 +32,12 @@ public class Generics {
             Toast.makeText(mContext, motivoError, Toast.LENGTH_SHORT).show();
             return null;
         }
+    }
+    private static ConnectivityManager manager;
+
+    public boolean isOnline() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 }
