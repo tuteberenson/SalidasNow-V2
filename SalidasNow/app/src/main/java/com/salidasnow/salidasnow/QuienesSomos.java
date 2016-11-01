@@ -1,5 +1,8 @@
 package com.salidasnow.salidasnow;
 
+import android.app.FragmentManager;
+import android.app.Fragment;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -21,5 +24,14 @@ public class QuienesSomos extends AppCompatActivity {
                 " Con esta simple aplicación vas poder conseguir infinidad restaurants cerca de ti con solo un click.");
 
         texto2.setText(" La aplicación fue creada en el año 2016, por Matias Berenson, Axel Brant, Ilan Pustilnikoff y Ariel Pisterman, un grupo de estudiantes de la Secundaria ORT Yatay.\n");;
+    }
+
+    @Override
+    public void onBackPressed() {
+       /* ActividadPrincipal actividadPrincipal=new ActividadPrincipal();
+        Intent activity=new Intent(QuienesSomos.this,ActividadPrincipal.class);
+        startActivity(activity);
+        actividadPrincipal.set_FragmentAlAzar();*/
+        finish();
     }
 }

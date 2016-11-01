@@ -121,7 +121,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
     void setEstadoServicio(boolean x) {
         if (x) {
             IniciarServicio();
-            PosicionActual();
+            PosicionActual(false);
         } else {
             pararServicio();
         }
@@ -139,18 +139,44 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
         }
         if (provider.equals("passive"))
         {
-            Toast.makeText(thisContext, "Activa el gps", Toast.LENGTH_SHORT).show();
-        }
+            showGPSDisabledAlertToUser();        }
         else if (provider == null)
         {
             Toast.makeText(thisContext, "Permite el acceso a tu ubicación", Toast.LENGTH_SHORT).show();
         }
         else {
-            handle.requestLocationUpdates(provider, 1200000, 1, this);
+            handle.requestLocationUpdates(provider, 10000, 1, this);
+            PosicionActual(false);
         }
     }
+    private void showGPSDisabledAlertToUser() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(thisContext);
+        alertDialogBuilder
+                .setMessage(
+                        "Active la ubicación")
+                .setCancelable(false)
+                .setPositiveButton("Ir a configuración",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent callGPSSettingIntent = new Intent(
+                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivity(callGPSSettingIntent);
 
-    public void PosicionActual() {
+                            }
+                        });
+
+        alertDialogBuilder.setNegativeButton("Cancelar",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }// ;
+
+    public void PosicionActual(boolean mostrarRestaurantes) {
         if (ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -160,13 +186,19 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
            // longitud.setText("Longitud: desconocida");
             Toast.makeText(thisContext, "No se pudo obtener la ubicacion", Toast.LENGTH_SHORT).show();
         } else {
-            ubicacionActual=location;
-            String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byCercania.php?latitud="+location.getLatitude()+"&longitud="+location.getLongitude()+"&distancia="+LimiteDeCuadras;
-          Log.d(TAG,url);
-            new TraerRestaurantes().execute(url);
+            ubicacionActual = location;
+            if (mostrarRestaurantes) {
+                String url = "http://salidasnow.hol.es/Restaurantes/obtener_restaurantes_byCercania.php?latitud=" + location.getLatitude() + "&longitud=" + location.getLongitude() + "&distancia=" + LimiteDeCuadras;
+                Log.d(TAG, url);
+                new TraerRestaurantes().execute(url);
+                setDireccion(location);
+            }
+            else
+            {
+                setDireccion(location);
+            }
         }
 
-        setDireccion(location);
 
     }
 
@@ -323,7 +355,7 @@ public class FragmentCercaDeMi extends Fragment implements LocationListener {
 
 
                            listView.setAdapter(null);
-                            PosicionActual();
+                            PosicionActual(true);
 
                        // }
                      //   else

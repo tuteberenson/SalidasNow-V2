@@ -151,11 +151,11 @@ public class ActividadPrincipal extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_nosotros) {
+       /* if (id == R.id.action_nosotros) {
             Intent actividadnosotros= new Intent(ActividadPrincipal.this,QuienesSomos.class);
             startActivity(actividadnosotros);
         }
-        else if (id == R.id.action_random)
+        else*/ if (id == R.id.action_random)
         {
 
         }
@@ -299,6 +299,12 @@ public class ActividadPrincipal extends AppCompatActivity
                 finish();
             }
         }
+        else if (id == R.id.action_nosotros)
+        {
+            set_FragmentAlAzar();
+            Intent actividadnosotros= new Intent(ActividadPrincipal.this,QuienesSomos.class);
+            startActivity(actividadnosotros);
+        }
         try {
             fragment = (Fragment) fragmentClass.newInstance();
         } catch (Exception e) {
@@ -380,6 +386,12 @@ public class ActividadPrincipal extends AppCompatActivity
                 });
 
         return builder.create();
+    }
+    public void set_FragmentAlAzar()
+    {
+        Fragment fragmentARemplazar= new FragmentRestaurantesAzar();
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.FrameContenedor, fragmentARemplazar).commit();
     }
 
 }
