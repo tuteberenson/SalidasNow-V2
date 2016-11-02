@@ -301,6 +301,10 @@ public class ActividadPrincipal extends AppCompatActivity
         }
         else if (id == R.id.action_nosotros)
         {
+            itemAzar.setVisible(false);
+            itemSearch.setVisible(false);
+            itemMap.setVisible(false);
+            itemChange.setVisible(false);
             set_FragmentAlAzar();
             Intent actividadnosotros= new Intent(ActividadPrincipal.this,QuienesSomos.class);
             startActivity(actividadnosotros);
