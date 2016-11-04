@@ -31,13 +31,14 @@
                 android:icon="@drawable/ic_menu_share"
                 android:title="Share" />-->
             <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_keyboard_backspace_black_24dp"
-                android:title="Log out" />
-            <item
                 android:id="@+id/action_nosotros"
                 android:icon="@drawable/ic_group"
                 android:title="Nosotros" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_keyboard_backspace_black_24dp"
+                android:title="Log out" />
+
         </menu>
     </item>
 
