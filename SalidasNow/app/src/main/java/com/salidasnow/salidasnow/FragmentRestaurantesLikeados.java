@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FragmentRestaurantesLikeados extends Fragment {
+public class    FragmentRestaurantesLikeados extends Fragment {
 
     Context thisContext;
     ListView listView;

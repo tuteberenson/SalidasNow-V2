@@ -34,8 +34,12 @@
         android:text="Otras opciones"
         android:id="@+id/btnMasOpc"/>-->
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/buttonshape"
+        android:textSize="25dp"
         android:text="Recomendame"
         android:id="@+id/btnRecomendame"/>
     <ListView

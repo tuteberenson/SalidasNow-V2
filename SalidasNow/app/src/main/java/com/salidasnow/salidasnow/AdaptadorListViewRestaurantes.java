@@ -179,7 +179,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
         if (p.is_Likeado())
         {
             holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
-            holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
+            holder.unItemLV.setBackgroundColor(Color.rgb(237, 237, 149));
 
         }
         else
@@ -217,7 +217,7 @@ public class AdaptadorListViewRestaurantes extends ArrayAdapter<Restaurantes>{
                         {
                             holder.iconLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_star_black_24dp));
                             Toast.makeText(context, "Me gusta!", Toast.LENGTH_SHORT).show();
-                            holder.unItemLV.setBackgroundColor(Color.rgb(196, 198, 197));
+                            holder.unItemLV.setBackgroundColor(Color.rgb(237, 237, 149));
                             restaurants.get(position).set_Likeado(true);
                             holder.swipeLayout.close();
                         }
